@@ -8,55 +8,33 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Cultural Heritage Color Palette - Maroon & Beige */
-    --background: 45 25% 95%;
-    --foreground: 15 25% 15%;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
-    --card: 45 30% 92%;
-    --card-foreground: 15 25% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
 
-    --popover: 45 30% 92%;
-    --popover-foreground: 15 25% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 15 65% 25%;
-    --primary-foreground: 45 40% 95%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 45 20% 85%;
-    --secondary-foreground: 15 35% 20%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --muted: 45 15% 88%;
-    --muted-foreground: 15 15% 45%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 20 45% 35%;
-    --accent-foreground: 45 40% 95%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
-    --destructive: 0 65% 50%;
-    --destructive-foreground: 45 40% 95%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 45 20% 80%;
-    --input: 45 20% 80%;
-    --ring: 15 65% 25%;
-    
-    /* Cultural Design Tokens */
-    --heritage-maroon: 15 65% 25%;
-    --heritage-beige: 45 25% 85%;
-    --heritage-cream: 45 40% 95%;
-    --heritage-brown: 20 35% 30%;
-    --heritage-gold: 45 75% 60%;
-    
-    /* Gradients */
-    --gradient-cultural: linear-gradient(135deg, hsl(var(--heritage-maroon)), hsl(var(--heritage-brown)));
-    --gradient-warm: linear-gradient(180deg, hsl(var(--heritage-cream)), hsl(var(--heritage-beige)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--heritage-maroon) / 0.9), hsl(var(--heritage-brown) / 0.8));
-    
-    /* Shadows & Effects */
-    --shadow-cultural: 0 10px 30px -10px hsl(var(--heritage-maroon) / 0.3);
-    --shadow-warm: 0 4px 20px -5px hsl(var(--heritage-brown) / 0.2);
-    --glow-gold: 0 0 20px hsl(var(--heritage-gold) / 0.4);
-    
-    /* Typography */
-    --font-cultural: "Playfair Display", serif;
-    --font-modern: "Inter", sans-serif;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
 
@@ -78,40 +56,33 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 15 25% 8%;
-    --foreground: 45 30% 90%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-    --card: 15 20% 12%;
-    --card-foreground: 45 30% 90%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 15 20% 12%;
-    --popover-foreground: 45 30% 90%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 45 40% 85%;
-    --primary-foreground: 15 25% 15%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 15 15% 18%;
-    --secondary-foreground: 45 30% 85%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 15 15% 18%;
-    --muted-foreground: 45 15% 65%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 20 35% 25%;
-    --accent-foreground: 45 30% 85%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 55% 45%;
-    --destructive-foreground: 45 30% 90%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 15 15% 20%;
-    --input: 15 15% 20%;
-    --ring: 45 40% 75%;
-    
-    /* Dark mode cultural tokens */
-    --heritage-maroon: 15 55% 35%;
-    --heritage-beige: 45 20% 25%;
-    --heritage-cream: 45 25% 20%;
-    --heritage-brown: 20 25% 35%;
-    --heritage-gold: 45 65% 55%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
