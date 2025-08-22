@@ -1,146 +1,135 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Award, Users } from "lucide-react";
+import { MapPin, Award, Users, ArrowRight } from "lucide-react";
 
 const FeaturedArtists = () => {
   const artists = [
     {
       id: 1,
-      name: "Jivya Soma Mashe",
-      specialty: "Warli Art Master",
-      location: "Thane, Maharashtra",
-      experience: "50+ years",
-      recognition: "Padma Shri Awardee",
-      works: 200,
-      students: 500,
-      bio: "Pioneer in bringing Warli art to the global stage",
-      avatar: "👨‍🎨"
+      name: "Bhuri Bai",
+      artform: "Bhil Art",
+      location: "Madhya Pradesh",
+      experience: "40+ years",
+      recognition: "Padma Shri",
+      followers: "2.3k",
+      artworks: 156,
+      image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400&h=400&fit=crop&crop=face",
+      specialty: "Traditional dot paintings depicting tribal life"
     },
     {
       id: 2,
-      name: "Dulari Devi",
-      specialty: "Madhubani Artist",
-      location: "Ranti, Bihar",
+      name: "Sita Devi",
+      artform: "Madhubani",
+      location: "Bihar",
       experience: "35+ years",
-      recognition: "National Award Winner",
-      works: 150,
-      students: 300,
-      bio: "Renowned for her innovative Madhubani techniques",
-      avatar: "👩‍🎨"
+      recognition: "National Award",
+      followers: "1.8k",
+      artworks: 203,
+      image: "https://images.unsplash.com/photo-1494790108755-2616c6d58ad1?w=400&h=400&fit=crop&crop=face",
+      specialty: "Intricate fish and bird motifs in traditional style"
     },
     {
       id: 3,
-      name: "Lado Bai",
-      specialty: "Pithora Painter",
-      location: "Tejgadh, Gujarat",
-      experience: "40+ years",
-      recognition: "Master Craftsperson",
-      works: 180,
-      students: 250,
-      bio: "Preserving traditional Pithora ceremonial art",
-      avatar: "👩‍🎨"
+      name: "Jivya Soma Mashe",
+      artform: "Warli",
+      location: "Maharashtra",
+      experience: "50+ years",
+      recognition: "Padma Shri",
+      followers: "3.1k",
+      artworks: 289,
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+      specialty: "Contemporary interpretations of ancient Warli traditions"
+    },
+    {
+      id: 4,
+      name: "Ganga Devi",
+      artform: "Pithora",
+      location: "Gujarat",
+      experience: "30+ years",
+      recognition: "State Award",
+      followers: "1.2k",
+      artworks: 134,
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
+      specialty: "Ritualistic horse paintings and spiritual symbols"
     }
   ];
 
   return (
-    <section className="py-16 bg-background">
+    <section id="artists" className="py-20 bg-background">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-foreground mb-4">
+        <div className="text-center mb-16">
+          <h2 className="font-cultural text-4xl md:text-5xl font-bold text-primary mb-4">
             Master Artists
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Meet the guardians of traditional art forms who have dedicated their lives to preserving cultural heritage
+          <p className="font-modern text-lg text-muted-foreground max-w-3xl mx-auto">
+            Meet the guardians of our cultural heritage - talented artists who have dedicated 
+            their lives to preserving and promoting traditional folk artforms.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {artists.map((artist, index) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {artists.map((artist) => (
             <Card 
-              key={artist.id}
-              className="hover:shadow-lg transition-all duration-300 border-0 bg-card"
+              key={artist.id} 
+              className="group overflow-hidden hover:shadow-warm transition-all duration-300 bg-card border-border/50"
             >
-              <CardContent className="p-6">
-                {/* Artist Avatar & Basic Info */}
-                <div className="text-center mb-6">
-                  <div className="text-6xl mb-4">{artist.avatar}</div>
-                  <h3 className="text-xl font-semibold text-foreground mb-1">
-                    {artist.name}
-                  </h3>
-                  <p className="text-primary font-medium mb-2">
-                    {artist.specialty}
-                  </p>
-                  <div className="flex items-center justify-center text-sm text-muted-foreground mb-3">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    {artist.location}
-                  </div>
-                  <Badge variant="secondary" className="bg-accent/20 text-accent-foreground">
-                    <Award className="h-3 w-3 mr-1" />
+              <div className="relative">
+                <img
+                  src={artist.image}
+                  alt={artist.name}
+                  className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute top-3 right-3">
+                  <Badge className="bg-heritage-gold text-heritage-brown font-semibold">
+                    <Award className="w-3 h-3 mr-1" />
                     {artist.recognition}
                   </Badge>
                 </div>
-
-                {/* Artist Bio */}
-                <p className="text-muted-foreground text-sm text-center mb-6">
-                  {artist.bio}
+                <div className="absolute inset-0 bg-gradient-to-t from-heritage-brown/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+              
+              <CardContent className="p-5">
+                <h3 className="font-cultural text-lg font-semibold text-primary mb-1">
+                  {artist.name}
+                </h3>
+                
+                <div className="flex items-center text-heritage-gold text-sm font-medium mb-2">
+                  <span>{artist.artform}</span>
+                </div>
+                
+                <div className="flex items-center text-muted-foreground text-sm mb-3">
+                  <MapPin className="w-3 h-3 mr-1" />
+                  {artist.location} • {artist.experience}
+                </div>
+                
+                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                  {artist.specialty}
                 </p>
-
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">
-                      {artist.works}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Artworks
-                    </div>
+                
+                <div className="flex justify-between items-center text-xs text-muted-foreground mb-4">
+                  <div className="flex items-center">
+                    <Users className="w-3 h-3 mr-1" />
+                    {artist.followers} followers
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">
-                      {artist.students}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Students
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">
-                      {artist.experience.split('+')[0]}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Years
-                    </div>
-                  </div>
+                  <span>{artist.artworks} artworks</span>
                 </div>
-
-                {/* Actions */}
-                <div className="space-y-2">
-                  <Button 
-                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                  >
-                    View Gallery
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                  >
-                    <Users className="h-4 w-4 mr-2" />
-                    Connect
-                  </Button>
-                </div>
+                
+                <Button 
+                  variant="outline" 
+                  className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors text-sm"
+                >
+                  View Profile
+                </Button>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-          >
+        <div className="text-center">
+          <Button size="lg" className="bg-primary hover:bg-primary/90 font-semibold px-8">
             Discover More Artists
+            <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
       </div>

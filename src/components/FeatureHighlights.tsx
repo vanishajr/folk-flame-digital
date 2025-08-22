@@ -1,15 +1,16 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { 
   Mic, 
   Gamepad2, 
-  Heart, 
   ShoppingBag, 
-  Store, 
   Map, 
-  Camera,
-  Eye,
-  Palette
+  Camera, 
+  Building2, 
+  Palette, 
+  Volume2,
+  ArrowRight,
+  Sparkles
 } from "lucide-react";
 
 const FeatureHighlights = () => {
@@ -17,133 +18,146 @@ const FeatureHighlights = () => {
     {
       icon: <Mic className="h-8 w-8" />,
       title: "Voice Navigation",
-      description: "Navigate the platform using voice commands in multiple Indian languages",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50"
+      description: "Explore art collections using natural voice commands in multiple Indian languages",
+      color: "heritage-gold",
+      gradient: "from-heritage-gold/20 to-heritage-gold/5"
     },
     {
       icon: <Gamepad2 className="h-8 w-8" />,
       title: "Children's Learning",
-      description: "Interactive games and activities to teach traditional art forms to kids",
-      color: "text-green-600",
-      bgColor: "bg-green-50"
+      description: "Interactive games and stories introducing kids to traditional art forms",
+      color: "heritage-maroon",
+      gradient: "from-heritage-maroon/20 to-heritage-maroon/5"
     },
     {
-      icon: <Heart className="h-8 w-8" />,
+      icon: <Sparkles className="h-8 w-8" />,
       title: "Personalized Recommendations",
-      description: "AI-powered suggestions based on your art preferences and viewing history",
-      color: "text-red-600",
-      bgColor: "bg-red-50"
+      description: "AI-powered suggestions based on your interests and viewing history",
+      color: "heritage-brown",
+      gradient: "from-heritage-brown/20 to-heritage-brown/5"
     },
     {
       icon: <ShoppingBag className="h-8 w-8" />,
-      title: "Merchandise Store",
-      description: "Shop authentic handicrafts, prints, and art supplies from local artisans",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50"
-    },
-    {
-      icon: <Store className="h-8 w-8" />,
-      title: "Art Marketplace",
-      description: "Buy and sell original paintings directly from artists and collectors",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50"
+      title: "Artist Marketplace",
+      description: "Buy authentic artworks directly from traditional artists and support their livelihood",
+      color: "heritage-gold",
+      gradient: "from-heritage-gold/20 to-heritage-gold/5"
     },
     {
       icon: <Map className="h-8 w-8" />,
-      title: "Cultural Maps",
+      title: "Cultural Map",
       description: "Discover museums, galleries, and cultural centers near you",
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50"
+      color: "heritage-maroon",
+      gradient: "from-heritage-maroon/20 to-heritage-maroon/5"
     },
     {
       icon: <Camera className="h-8 w-8" />,
-      title: "AR Experiences",
-      description: "View artworks in your space using augmented reality technology",
-      color: "text-teal-600",
-      bgColor: "bg-teal-50"
+      title: "AR Experience",
+      description: "Bring artworks to life with augmented reality and 3D visualizations",
+      color: "heritage-brown",
+      gradient: "from-heritage-brown/20 to-heritage-brown/5"
     },
     {
-      icon: <Eye className="h-8 w-8" />,
-      title: "360° Museum Tours",
-      description: "Immersive virtual tours of famous museums and art galleries",
-      color: "text-cyan-600",
-      bgColor: "bg-cyan-50"
+      icon: <Building2 className="h-8 w-8" />,
+      title: "Virtual Museum Tours",
+      description: "360° immersive tours of famous museums and heritage sites",
+      color: "heritage-gold",
+      gradient: "from-heritage-gold/20 to-heritage-gold/5"
     },
     {
       icon: <Palette className="h-8 w-8" />,
       title: "Art Collections",
-      description: "Curated collections showcasing different styles and regional art forms",
-      color: "text-pink-600",
-      bgColor: "bg-pink-50"
+      description: "Curated galleries showcasing diverse traditional Indian folk artforms",
+      color: "heritage-maroon",
+      gradient: "from-heritage-maroon/20 to-heritage-maroon/5"
     }
   ];
 
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-20 bg-gradient-warm">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-foreground mb-4">
-            Platform Features
+        <div className="text-center mb-16">
+          <h2 className="font-cultural text-4xl md:text-5xl font-bold text-primary mb-4">
+            Innovative Cultural Experience
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover traditional art through cutting-edge technology and community-driven experiences
+          <p className="font-modern text-lg text-muted-foreground max-w-3xl mx-auto">
+            Discover traditional Indian art through cutting-edge technology and immersive experiences 
+            designed to preserve and promote our cultural heritage.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {features.map((feature, index) => (
             <Card 
-              key={index}
-              className="hover:shadow-lg transition-all duration-300 border-0 bg-card group cursor-pointer"
+              key={index} 
+              className="group hover:shadow-cultural transition-all duration-300 bg-card border-border/50 overflow-hidden"
             >
               <CardContent className="p-6 text-center">
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${feature.bgColor} ${feature.color} mb-4 group-hover:scale-110 transition-transform`}>
+                <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br ${feature.gradient} flex items-center justify-center text-${feature.color} group-hover:scale-110 transition-transform duration-300`}>
                   {feature.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-3">
+                
+                <h3 className="font-cultural text-lg font-semibold text-primary mb-3">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground text-sm mb-4">
+                
+                <p className="font-modern text-sm text-muted-foreground leading-relaxed mb-4">
                   {feature.description}
                 </p>
+                
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  className="text-primary hover:text-primary-foreground hover:bg-primary"
+                  className="group-hover:bg-primary/10 group-hover:text-primary transition-colors"
                 >
                   Learn More
+                  <ArrowRight className="ml-2 h-3 w-3" />
                 </Button>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <div className="max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-foreground mb-4">
-              Empowering Artists, Preserving Heritage
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              Our platform bridges the gap between traditional art forms and modern technology, 
-              creating sustainable livelihoods for artists while preserving cultural heritage for future generations.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button 
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-                size="lg"
-              >
-                Start Exploring
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Quick Access Voice Panel */}
+          <Card className="bg-gradient-cultural text-primary-foreground overflow-hidden">
+            <CardContent className="p-8">
+              <div className="flex items-center mb-4">
+                <Volume2 className="h-6 w-6 mr-3" />
+                <h3 className="font-cultural text-xl font-semibold">
+                  Voice-Activated Discovery
+                </h3>
+              </div>
+              <p className="font-modern mb-6 opacity-90">
+                "Hey Heritage, show me Warli paintings from Maharashtra" - 
+                Experience hands-free exploration of our cultural treasures.
+              </p>
+              <Button className="bg-heritage-gold text-heritage-brown hover:bg-heritage-gold/90 font-semibold">
+                <Mic className="mr-2 h-4 w-4" />
+                Try Voice Search
               </Button>
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-              >
-                Join as Artist
+            </CardContent>
+          </Card>
+
+          {/* Featured Experience */}
+          <Card className="bg-heritage-beige text-heritage-brown overflow-hidden">
+            <CardContent className="p-8">
+              <div className="flex items-center mb-4">
+                <Camera className="h-6 w-6 mr-3" />
+                <h3 className="font-cultural text-xl font-semibold">
+                  AR Art Experience
+                </h3>
+              </div>
+              <p className="font-modern mb-6">
+                Point your camera at any surface and watch traditional artworks 
+                come alive with stories, animations, and interactive elements.
+              </p>
+              <Button className="bg-heritage-maroon text-primary-foreground hover:bg-heritage-maroon/90 font-semibold">
+                <Sparkles className="mr-2 h-4 w-4" />
+                Launch AR Mode
               </Button>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>

@@ -1,80 +1,130 @@
 import { useState } from "react";
+import { Menu, X, Mic, Search, User, ShoppingBag, Map, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Menu, Search, Mic, User, Heart, ShoppingBag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 const Navigation = () => {
-  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navItems = [
+    { name: "Explore", href: "#explore" },
+    { name: "Collections", href: "#collections" },
+    { name: "Artists", href: "#artists" },
+    { name: "Museum Tours", href: "#tours" },
+    { name: "Children", href: "#children" },
+    { name: "Store", href: "#store" },
+    { name: "AR Experience", href: "#ar" },
+  ];
 
   return (
-    <nav className="bg-background border-b border-border sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          {/* Logo & Menu */}
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm">
-              <Menu className="h-5 w-5" />
-            </Button>
-            <h1 className="text-xl font-bold text-primary">Heritage Arts & Culture</h1>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-cultural rounded-lg flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">H</span>
+            </div>
+            <span className="font-cultural text-xl font-semibold text-primary">
+              Heritage Arts
+            </span>
           </div>
 
-          {/* Navigation Menu */}
-          <div className="hidden md:flex space-x-6">
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              Home
-            </Button>
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              Explore
-            </Button>
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              Play
-            </Button>
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              Nearby
-            </Button>
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              Collections
-            </Button>
-          </div>
-
-          {/* Search & Actions */}
-          <div className="flex items-center space-x-3">
-            {isSearchActive ? (
-              <div className="flex items-center space-x-2">
-                <Input 
-                  placeholder="Search traditional arts..." 
-                  className="w-64"
-                  onBlur={() => setIsSearchActive(false)}
-                  autoFocus
-                />
-                <Button variant="ghost" size="sm">
-                  <Mic className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setIsSearchActive(true)}
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-1">
+            {navItems.map((item) => (
+              <Button
+                key={item.name}
+                variant="ghost"
+                className="text-sm font-medium text-foreground hover:text-primary hover:bg-secondary/50"
+                asChild
               >
-                <Search className="h-5 w-5" />
+                <a href={item.href}>{item.name}</a>
               </Button>
-            )}
-            
-            <Button variant="ghost" size="sm">
-              <Heart className="h-5 w-5" />
+            ))}
+          </div>
+
+          {/* Search and Actions */}
+          <div className="hidden md:flex items-center space-x-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search artforms, artists..."
+                className="pl-10 w-64 bg-muted/50 border-border focus:bg-background"
+              />
+            </div>
+            <Button size="sm" variant="outline" className="gap-2">
+              <Mic className="h-4 w-4" />
+              Voice
             </Button>
-            <Button variant="ghost" size="sm">
-              <ShoppingBag className="h-5 w-5" />
+            <Button size="sm" variant="outline">
+              <Map className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm">
-              <User className="h-5 w-5" />
+            <Button size="sm" variant="outline">
+              <Camera className="h-4 w-4" />
             </Button>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Sign In
+            <Button size="sm" variant="outline">
+              <ShoppingBag className="h-4 w-4" />
+            </Button>
+            <Button size="sm" variant="outline">
+              <User className="h-4 w-4" />
             </Button>
           </div>
+
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
         </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden py-4 border-t border-border">
+            <div className="flex flex-col space-y-2">
+              {navItems.map((item) => (
+                <Button
+                  key={item.name}
+                  variant="ghost"
+                  className="justify-start text-sm font-medium"
+                  asChild
+                >
+                  <a href={item.href} onClick={() => setIsMenuOpen(false)}>
+                    {item.name}
+                  </a>
+                </Button>
+              ))}
+              <div className="pt-2 mt-2 border-t border-border">
+                <div className="relative mb-3">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search..."
+                    className="pl-10 bg-muted/50"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" variant="outline" className="gap-2">
+                    <Mic className="h-4 w-4" />
+                    Voice
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    <Map className="h-4 w-4" />
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    <Camera className="h-4 w-4" />
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    <ShoppingBag className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

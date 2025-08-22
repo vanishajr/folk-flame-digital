@@ -8,36 +8,57 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Maroon and Beige Heritage Theme */
-    --background: 45 40% 95%;
-    --foreground: 10 20% 15%;
+    /* Cultural Heritage Color Palette - Maroon & Beige */
+    --background: 45 25% 95%;
+    --foreground: 15 25% 15%;
 
-    --card: 45 35% 97%;
-    --card-foreground: 10 20% 15%;
+    --card: 45 30% 92%;
+    --card-foreground: 15 25% 15%;
 
-    --popover: 45 35% 97%;
-    --popover-foreground: 10 20% 15%;
+    --popover: 45 30% 92%;
+    --popover-foreground: 15 25% 15%;
 
-    --primary: 10 60% 25%;
+    --primary: 15 65% 25%;
     --primary-foreground: 45 40% 95%;
 
-    --secondary: 35 25% 85%;
-    --secondary-foreground: 10 50% 20%;
+    --secondary: 45 20% 85%;
+    --secondary-foreground: 15 35% 20%;
 
-    --muted: 40 20% 88%;
+    --muted: 45 15% 88%;
     --muted-foreground: 15 15% 45%;
 
-    --accent: 25 40% 75%;
-    --accent-foreground: 10 50% 20%;
+    --accent: 20 45% 35%;
+    --accent-foreground: 45 40% 95%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 45 40% 95%;
 
-    --border: 35 20% 82%;
-    --input: 35 20% 82%;
-    --ring: 10 60% 25%;
+    --border: 45 20% 80%;
+    --input: 45 20% 80%;
+    --ring: 15 65% 25%;
+    
+    /* Cultural Design Tokens */
+    --heritage-maroon: 15 65% 25%;
+    --heritage-beige: 45 25% 85%;
+    --heritage-cream: 45 40% 95%;
+    --heritage-brown: 20 35% 30%;
+    --heritage-gold: 45 75% 60%;
+    
+    /* Gradients */
+    --gradient-cultural: linear-gradient(135deg, hsl(var(--heritage-maroon)), hsl(var(--heritage-brown)));
+    --gradient-warm: linear-gradient(180deg, hsl(var(--heritage-cream)), hsl(var(--heritage-beige)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--heritage-maroon) / 0.9), hsl(var(--heritage-brown) / 0.8));
+    
+    /* Shadows & Effects */
+    --shadow-cultural: 0 10px 30px -10px hsl(var(--heritage-maroon) / 0.3);
+    --shadow-warm: 0 4px 20px -5px hsl(var(--heritage-brown) / 0.2);
+    --glow-gold: 0 0 20px hsl(var(--heritage-gold) / 0.4);
+    
+    /* Typography */
+    --font-cultural: "Playfair Display", serif;
+    --font-modern: "Inter", sans-serif;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -57,34 +78,40 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Dark Maroon and Beige Theme */
-    --background: 10 15% 8%;
+    --background: 15 25% 8%;
     --foreground: 45 30% 90%;
 
-    --card: 10 20% 12%;
+    --card: 15 20% 12%;
     --card-foreground: 45 30% 90%;
 
-    --popover: 10 20% 12%;
+    --popover: 15 20% 12%;
     --popover-foreground: 45 30% 90%;
 
-    --primary: 45 30% 85%;
-    --primary-foreground: 10 15% 8%;
+    --primary: 45 40% 85%;
+    --primary-foreground: 15 25% 15%;
 
-    --secondary: 15 25% 20%;
+    --secondary: 15 15% 18%;
     --secondary-foreground: 45 30% 85%;
 
-    --muted: 15 20% 18%;
-    --muted-foreground: 30 15% 65%;
+    --muted: 15 15% 18%;
+    --muted-foreground: 45 15% 65%;
 
-    --accent: 25 30% 35%;
+    --accent: 20 35% 25%;
     --accent-foreground: 45 30% 85%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 55% 45%;
+    --destructive-foreground: 45 30% 90%;
 
-    --border: 15 20% 25%;
-    --input: 15 20% 25%;
-    --ring: 45 30% 85%;
+    --border: 15 15% 20%;
+    --input: 15 15% 20%;
+    --ring: 45 40% 75%;
+    
+    /* Dark mode cultural tokens */
+    --heritage-maroon: 15 55% 35%;
+    --heritage-beige: 45 20% 25%;
+    --heritage-cream: 45 25% 20%;
+    --heritage-brown: 20 25% 35%;
+    --heritage-gold: 45 65% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
