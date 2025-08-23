@@ -13,7 +13,6 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { SearchProvider } from "@/contexts/SearchContext";
 import { Toaster as HotToaster } from "react-hot-toast";
 
-import Index from "./pages/Index";
 import ARViewer from "./pages/ARViewer";
 import AllCollections from "./pages/AllCollections";
 import CollectionDetail from "./pages/CollectionDetail";
