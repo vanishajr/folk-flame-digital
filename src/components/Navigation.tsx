@@ -1,5 +1,7 @@
 import { useState } from "react";
+
 import { Menu, X, Mic, Search, User, ShoppingBag, Map, Camera, LogIn, LogOut, Globe, ChevronDown } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
@@ -21,11 +23,15 @@ const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isVoiceSearchOpen, setIsVoiceSearchOpen] = useState(false);
+
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [authView, setAuthView] = useState<"login" | "signup" | "profile">("login");
+
   const { currentUser, userProfile, logout } = useAuth();
+
   const { performSearch } = useSearch();
   const { language, setLanguage, t, currentLanguage } = useLanguage();
+
 
   const languages = [
     { code: 'en', name: 'English', native: 'English' },
@@ -44,15 +50,15 @@ const Navigation = () => {
   };
 
   const navItems = [
+
     { name: t('nav.explore'), href: "#explore", isLink: false },
-    { name: t('nav.collections'), href: "#collections", isLink: false },
-    { name: t('nav.artists'), href: "#artists", isLink: false },
     { name: t('nav.museum_tours'), href: "#tours", isLink: false },
     { name: t('nav.children'), href: "/children", isLink: true },
-    { name: t('nav.store'), href: "#store", isLink: false },
+    { name: "Marketplace", href: "/marketplace", isLink: false },
     { name: t('nav.ar_experience'), href: "#ar", isLink: false },
     { name: "Export Guide", href: "/export-compliance", isLink: true },
     { name: "Artist Badges", href: "/artist-badging", isLink: true },
+
   ];
 
   const handleLanguageChange = (lang: typeof languages[0]) => {
@@ -107,11 +113,48 @@ const Navigation = () => {
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
+
                 placeholder={t('nav.search_placeholder')}
-                className="pl-10 w-full bg-muted/50 border-border focus:bg-background"
+                className="pl-10 w-64 bg-muted/50 border-border focus:bg-background"
+
               />
             </div>
-          </div>
+            
+            {/* Language Selector */}
+            <div className="relative">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+              >
+                <Globe className="h-4 w-4" />
+                {currentLanguage.native}
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+              
+              {isLanguageDropdownOpen && (
+                <div className="absolute top-full right-0 mt-1 w-48 bg-background border border-border rounded-lg shadow-lg z-50">
+                  <div className="py-2">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => handleLanguageChange(lang)}
+                        className={`w-full px-4 py-2 text-left text-sm hover:bg-secondary/50 transition-colors ${
+                          language === lang.code ? 'bg-secondary text-primary' : 'text-foreground'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>{lang.native}</span>
+                          <span className="text-xs text-muted-foreground">{lang.name}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
 
           {/* Right Side Icons and Actions */}
           <div className="flex items-center space-x-2">
@@ -159,6 +202,16 @@ const Navigation = () => {
             >
               <Mic className="h-4 w-4" />
               <span className="hidden lg:inline">{t('nav.voice')}</span>
+
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="gap-2"
+              onClick={() => setIsVoiceSearchOpen(true)}
+            >
+              <Mic className="h-4 w-4" />
+              {t('nav.voice')}
+
             </Button>
 
             {/* Action Icons */}
@@ -174,6 +227,7 @@ const Navigation = () => {
 
             {/* User Authentication */}
             {currentUser ? (
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -211,6 +265,7 @@ const Navigation = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+
             ) : (
               <Button
                 size="sm"
@@ -222,7 +277,10 @@ const Navigation = () => {
                 className="flex items-center space-x-2"
               >
                 <LogIn className="h-4 w-4" />
-                <span className="hidden lg:inline">{t('nav.sign_in')}</span>
+
+
+                <span className="hidden lg:inline">Sign In</span>
+
               </Button>
             )}
 
@@ -295,6 +353,34 @@ const Navigation = () => {
 
               {/* Mobile Action Buttons */}
               <div className="pt-2 mt-2 border-t border-border">
+
+                <div className="relative mb-3">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder={t('nav.search_placeholder')}
+                    className="pl-10 bg-muted/50"
+                  />
+                </div>
+                
+                {/* Mobile Language Selector */}
+                <div className="mb-3">
+                  <div className="text-xs text-muted-foreground mb-2">Language</div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {languages.map((lang) => (
+                      <Button
+                        key={lang.code}
+                        size="sm"
+                        variant={language === lang.code ? "default" : "outline"}
+                        onClick={() => handleLanguageChange(lang)}
+                        className="text-xs"
+                      >
+                        {lang.native}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                
+
                 <div className="flex flex-wrap gap-2">
                   <Button
                     size="sm"

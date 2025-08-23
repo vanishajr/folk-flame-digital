@@ -1,13 +1,21 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Toaster } from "@/components/ui/sonner";
+// import { Toaster } from "@/components/ui/sonner";
 import HotToaster from "react-hot-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SearchProvider } from "@/contexts/SearchContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
+
 import Index from "./pages/Index";
+import Children from "./pages/Children";
+import Marketplace from "./pages/Marketplace";
+import YourArtworks from "./pages/YourArtworks";
+import { Toaster as HotToaster } from "react-hot-toast";
+
+
 import ARViewer from "./pages/ARViewer";
 import AllCollections from "./pages/AllCollections";
 import CollectionDetail from "./pages/CollectionDetail";
@@ -33,6 +41,7 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+
     <LanguageProvider>
       <AuthProvider>
         <SearchProvider>
@@ -53,6 +62,7 @@ const App = () => (
                 <Route path="/export-compliance" element={<ExportCompliance />} />
                 <Route path="/artist-badging" element={<ArtistBadging />} />
                 <Route path="/auth-demo" element={<AuthDemo />} />
+                <Route path="/artworks" element={<YourArtworks />} />
                 <Route path="/payment" element={<PaymentPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
@@ -62,6 +72,7 @@ const App = () => (
         </SearchProvider>
       </AuthProvider>
     </LanguageProvider>
+
   </QueryClientProvider>
 );
 
