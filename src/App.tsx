@@ -6,7 +6,11 @@ import HotToaster from "react-hot-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SearchProvider } from "@/contexts/SearchContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+
 import Index from "./pages/Index";
+import Children from "./pages/Children";
+import Marketplace from "./pages/Marketplace";
+import YourArtworks from "./pages/YourArtworks";
 import ARViewer from "./pages/ARViewer";
 import AllCollections from "./pages/AllCollections";
 import CollectionDetail from "./pages/CollectionDetail";
@@ -15,7 +19,14 @@ import ArtistProfile from "./pages/ArtistProfile";
 import NotFound from "./pages/NotFound";
 import AuthDemo from "./pages/AuthDemo";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -34,6 +45,9 @@ const App = () => (
                 <Route path="/artists" element={<AllArtists />} />
                 <Route path="/artists/:id" element={<ArtistProfile />} />
                 <Route path="/auth-demo" element={<AuthDemo />} />
+                <Route path="/children" element={<Children />} />
+                <Route path="/artworks" element={<YourArtworks />} />
+                <Route path="/marketplace" element={<Marketplace />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

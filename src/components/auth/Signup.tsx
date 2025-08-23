@@ -5,8 +5,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { Mail, Lock, Phone, Eye, EyeOff, Loader2, User } from 'lucide-react';
+import { Phone, Loader2, User } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import OTPVerification from './OTPVerification';
 
 interface SignupProps {
   onSwitchToLogin: () => void;
@@ -14,42 +15,36 @@ interface SignupProps {
 }
 
 const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('email');
+  const [activeTab, setActiveTab] = useState('google');
+  const [showOTP, setShowOTP] = useState(false);
+  const [verificationId, setVerificationId] = useState('');
 
-  const { signup, loginWithGoogle } = useAuth();
+  const { loginWithPhone, verifyOTP, loginWithGoogle } = useAuth();
 
-  const handleEmailSignup = async (e: React.FormEvent) => {
+  const handlePhoneSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !confirmPassword || !phoneNumber || !displayName) {
+    if (!phoneNumber || !displayName) {
       toast.error('Please fill in all fields');
       return;
     }
 
-    if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-
-    if (password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
-      return;
+    // Format phone number to include country code if not present
+    let formattedPhone = phoneNumber;
+    if (!phoneNumber.startsWith('+')) {
+      formattedPhone = '+91' + phoneNumber; // Default to India (+91)
     }
 
     setIsLoading(true);
     try {
-      await signup(email, password, phoneNumber);
-      toast.success('Account created successfully!');
-      onClose();
+      const result = await loginWithPhone(formattedPhone);
+      setVerificationId(result.verificationId);
+      setShowOTP(true);
+      toast.success('OTP sent successfully!');
     } catch (error: any) {
-      toast.error(error.message || 'Signup failed');
+      toast.error(error.message || 'Failed to send OTP');
     } finally {
       setIsLoading(false);
     }
@@ -68,17 +63,30 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
     }
   };
 
-  const handlePhoneSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!phoneNumber || !displayName) {
-      toast.error('Please fill in all fields');
-      return;
+  const handleOTPVerification = async (otp: string) => {
+    try {
+      await verifyOTP(verificationId, otp);
+      toast.success('Account created successfully!');
+      onClose();
+    } catch (error: any) {
+      toast.error(error.message || 'OTP verification failed');
     }
-
-    // For phone authentication, you would typically integrate with Firebase Phone Auth
-    // For now, we'll show a placeholder message
-    toast.info('Phone authentication will be implemented with Firebase Phone Auth');
   };
+
+  const handleBackToPhone = () => {
+    setShowOTP(false);
+    setVerificationId('');
+  };
+
+  if (showOTP) {
+    return (
+      <OTPVerification
+        phoneNumber={phoneNumber}
+        onBack={handleBackToPhone}
+        onSuccess={handleOTPVerification}
+      />
+    );
+  }
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -90,172 +98,10 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="email">Email</TabsTrigger>
-            <TabsTrigger value="phone">Phone</TabsTrigger>
-            <TabsTrigger value="google">Google</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="google">Google (Free)</TabsTrigger>
+            <TabsTrigger value="phone">Phone (Billing Required)</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="email" className="space-y-4">
-            <form onSubmit={handleEmailSignup} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="displayName">Full Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="displayName"
-                    type="text"
-                    placeholder="Enter your full name"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Create a password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="Confirm your password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  'Create Account'
-                )}
-              </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="phone" className="space-y-4">
-            <form onSubmit={handlePhoneSignup} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="phoneDisplayName">Full Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="phoneDisplayName"
-                    type="text"
-                    placeholder="Enter your full name"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber">Phone Number</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="phoneNumber"
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sending OTP...
-                  </>
-                ) : (
-                  'Send OTP'
-                )}
-              </Button>
-            </form>
-          </TabsContent>
 
           <TabsContent value="google" className="space-y-4">
             <Button
@@ -293,6 +139,66 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
                 </>
               )}
             </Button>
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                Google Sign-in is completely free and doesn't require billing setup
+              </p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="phone" className="space-y-4">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
+              <p className="text-xs text-amber-800">
+                <strong>⚠️ Billing Required:</strong> Phone authentication requires Firebase billing to be enabled.
+                <br />
+                <span className="text-amber-700">💡 Recommendation: Use Google Sign-in above (completely free)</span>
+              </p>
+            </div>
+            <form onSubmit={handlePhoneSignup} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="displayName">Display Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="displayName"
+                    type="text"
+                    placeholder="Enter your display name"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  We'll send you a 6-digit verification code
+                </p>
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending OTP...
+                  </>
+                ) : (
+                  'Send OTP'
+                )}
+              </Button>
+            </form>
           </TabsContent>
         </Tabs>
 
@@ -307,6 +213,9 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin, onClose }) => {
             </button>
           </p>
         </div>
+
+        {/* Hidden reCAPTCHA container for Firebase Phone Auth */}
+        <div id="recaptcha-container" className="hidden"></div>
       </CardContent>
     </Card>
   );

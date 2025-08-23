@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogOverlay, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import Login from './Login';
 import Signup from './Signup';
@@ -93,6 +93,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogOverlay className="bg-background/80 backdrop-blur-sm" />
       <DialogContent className="sm:max-w-md p-0 bg-transparent border-0">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Authentication</DialogTitle>
+          <DialogDescription>
+            Sign in to your account or create a new one
+          </DialogDescription>
+        </DialogHeader>
         {renderContent()}
       </DialogContent>
     </Dialog>

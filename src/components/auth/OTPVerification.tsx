@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
 import { Loader2, ArrowLeft, CheckCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
@@ -9,7 +8,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 interface OTPVerificationProps {
   phoneNumber: string;
   onBack: () => void;
-  onSuccess: () => void;
+  onSuccess: (otp: string) => void;
 }
 
 const OTPVerification: React.FC<OTPVerificationProps> = ({ 
@@ -38,19 +37,27 @@ const OTPVerification: React.FC<OTPVerificationProps> = ({
 
     setIsLoading(true);
     try {
-      // Here you would typically verify the OTP with Firebase Phone Auth
-      // For now, we'll simulate the verification process
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setIsVerified(true);
-      toast.success('Phone number verified successfully!');
-      
-      // Auto-close after showing success
-      setTimeout(() => {
-        onSuccess();
-      }, 1500);
+      console.log('Verifying OTP:', otp);
+      // Call the onSuccess callback with the OTP
+      await onSuccess(otp);
     } catch (error: any) {
-      toast.error(error.message || 'OTP verification failed');
+      console.error('OTP verification error:', error);
+      let errorMessage = 'OTP verification failed';
+      
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/invalid-verification-code':
+            errorMessage = 'Invalid OTP code';
+            break;
+          case 'auth/invalid-verification-id':
+            errorMessage = 'OTP expired. Please request a new one';
+            break;
+          default:
+            errorMessage = error.message || 'OTP verification failed';
+        }
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -60,6 +67,7 @@ const OTPVerification: React.FC<OTPVerificationProps> = ({
     setIsResending(true);
     try {
       // Here you would typically resend the OTP
+      // For now, we'll simulate the resend process
       await new Promise(resolve => setTimeout(resolve, 1000));
       setCountdown(30);
       toast.success('OTP resent successfully!');
@@ -110,7 +118,7 @@ const OTPVerification: React.FC<OTPVerificationProps> = ({
             render={({ slots }) => (
               <InputOTPGroup className="gap-2 justify-center">
                 {slots.map((slot, index) => (
-                  <InputOTPSlot key={index} {...slot} />
+                  <InputOTPSlot key={index} index={index} {...slot} />
                 ))}
               </InputOTPGroup>
             )}
