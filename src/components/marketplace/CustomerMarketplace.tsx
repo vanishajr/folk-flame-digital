@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,7 +16,9 @@ import {
   Eye,
   MapPin,
   Calendar,
-  Palette
+  Palette,
+  CreditCard,
+  CheckCircle
 } from 'lucide-react';
 
 interface Artwork {
@@ -41,6 +44,8 @@ interface Artwork {
 
 const CustomerMarketplace: React.FC = () => {
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [filteredArtworks, setFilteredArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +55,7 @@ const CustomerMarketplace: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>('newest');
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [cart, setCart] = useState<string[]>([]);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Mock data for demonstration
   const mockArtworks: Artwork[] = [
@@ -103,6 +109,13 @@ const CustomerMarketplace: React.FC = () => {
   useEffect(() => {
     filterArtworks();
   }, [artworks, searchTerm, selectedCategory, priceRange, sortBy]);
+
+  useEffect(() => {
+    if (location.state?.success) {
+      setSuccessMessage('Payment successful! Your artwork is on its way.');
+      setTimeout(() => setSuccessMessage(null), 5000); // Hide after 5 seconds
+    }
+  }, [location.state]);
 
   const filterArtworks = () => {
     let filtered = [...artworks];
@@ -161,6 +174,12 @@ const CustomerMarketplace: React.FC = () => {
         ? prev 
         : [...prev, artworkId]
     );
+  };
+
+  const buyNow = (artwork: Artwork) => {
+    navigate('/payment', { 
+      state: { artwork } 
+    });
   };
 
   const formatPrice = (price: number, currency: string) => {
@@ -336,13 +355,24 @@ const CustomerMarketplace: React.FC = () => {
                 <div className="text-lg font-bold text-amber-600">
                   {formatPrice(artwork.price.amount, artwork.price.currency)}
                 </div>
-                <Button 
-                  size="sm"
-                  className="bg-amber-600 hover:bg-amber-700"
-                  onClick={() => addToCart(artwork.id)}
-                >
-                  Add to Cart
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm"
+                    variant="outline"
+                    onClick={() => addToCart(artwork.id)}
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-1" />
+                    Cart
+                  </Button>
+                  <Button 
+                    size="sm"
+                    className="bg-amber-600 hover:bg-amber-700"
+                    onClick={() => buyNow(artwork)}
+                  >
+                    <CreditCard className="h-4 w-4 mr-1" />
+                    Buy Now
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -366,6 +396,15 @@ const CustomerMarketplace: React.FC = () => {
           >
             Clear Filters
           </Button>
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+          <div className="flex items-center">
+            <CheckCircle className="w-5 h-5 mr-2" />
+            {successMessage}
+          </div>
         </div>
       )}
     </div>

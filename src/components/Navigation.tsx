@@ -34,8 +34,6 @@ const Navigation = () => {
     { code: 'ml', name: 'Malayalam', native: 'മലയാളം' }
   ];
 
-  const [showAuthModal, setShowAuthModal] = useState(false);
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -53,6 +51,8 @@ const Navigation = () => {
     { name: t('nav.children'), href: "/children", isLink: true },
     { name: t('nav.store'), href: "#store", isLink: false },
     { name: t('nav.ar_experience'), href: "#ar", isLink: false },
+    { name: "Export Guide", href: "/export-compliance", isLink: true },
+    { name: "Artist Badges", href: "/artist-badging", isLink: true },
   ];
 
   const handleLanguageChange = (lang: typeof languages[0]) => {
@@ -102,16 +102,19 @@ const Navigation = () => {
             </div>
           </div>
 
-          {/* Search and Actions */}
-          <div className="hidden md:flex items-center space-x-3">
-            <div className="relative">
+          {/* Search Bar - Center */}
+          <div className="hidden md:flex flex-1 max-w-md mx-8">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={t('nav.search_placeholder')}
-                className="pl-10 w-64 bg-muted/50 border-border focus:bg-background"
+                className="pl-10 w-full bg-muted/50 border-border focus:bg-background"
               />
             </div>
-            
+          </div>
+
+          {/* Right Side Icons and Actions */}
+          <div className="flex items-center space-x-2">
             {/* Language Selector */}
             <div className="relative">
               <Button 
@@ -147,24 +150,29 @@ const Navigation = () => {
               )}
             </div>
 
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="gap-2"
+            {/* Voice Search Button */}
+            <Button
+              size="sm"
+              variant="outline"
+              className={`gap-2 hidden sm:flex ${isMenuOpen ? 'hidden' : ''}`}
               onClick={() => setIsVoiceSearchOpen(true)}
             >
               <Mic className="h-4 w-4" />
-              {t('nav.voice')}
+              <span className="hidden lg:inline">{t('nav.voice')}</span>
             </Button>
-            <Button size="sm" variant="outline">
+
+            {/* Action Icons */}
+            <Button size="sm" variant="outline" className={`hidden sm:flex ${isMenuOpen ? 'hidden' : ''}`}>
               <Map className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="outline">
+            <Button size="sm" variant="outline" className={`hidden sm:flex ${isMenuOpen ? 'hidden' : ''}`}>
               <Camera className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="outline">
+            <Button size="sm" variant="outline" className={`hidden sm:flex ${isMenuOpen ? 'hidden' : ''}`}>
               <ShoppingBag className="h-4 w-4" />
             </Button>
+
+            {/* User Authentication */}
             {currentUser ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -174,22 +182,29 @@ const Navigation = () => {
                     className="flex items-center space-x-2"
                   >
                     <Avatar className="h-6 w-6">
-                      <AvatarImage src={userProfile?.photoURL} alt={userProfile?.displayName || t('nav.user')} />
+                      <AvatarImage
+                        src={userProfile?.photoURL}
+                        alt={userProfile?.displayName || t('nav.user')}
+                      />
                       <AvatarFallback className="text-xs">
-                        {userProfile?.displayName ? userProfile.displayName.charAt(0).toUpperCase() : 'U'}
+                        {userProfile?.displayName
+                          ? userProfile.displayName.charAt(0).toUpperCase()
+                          : "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden sm:inline">{userProfile?.displayName || t('nav.user')}</span>
+                    <span className="hidden lg:inline">{userProfile?.displayName || t('nav.user')}</span>
+                    <ChevronDown className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => {
-                    setAuthView('profile');
-                    setIsAuthModalOpen(true);
-                  }}>
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
+                  {/* ✅ Your Artworks button */}
+                  <DropdownMenuItem asChild>
+                    <Link to="/artworks">
+                      <User className="mr-2 h-4 w-4" />
+                      Your Artworks
+                    </Link>
                   </DropdownMenuItem>
+
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
@@ -201,33 +216,40 @@ const Navigation = () => {
                 size="sm"
                 variant="outline"
                 onClick={() => {
-                  setAuthView('login');
+                  setAuthView("login");
                   setIsAuthModalOpen(true);
                 }}
                 className="flex items-center space-x-2"
               >
                 <LogIn className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('nav.sign_in')}</span>
+                <span className="hidden lg:inline">{t('nav.sign_in')}</span>
               </Button>
             )}
-          </div>
 
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="lg:hidden ml-2"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
+          <div className="lg:hidden py-4 border-t border-border">
             <div className="flex flex-col space-y-2">
-              {navItems.map((item) => (
+              {/* Mobile Search Bar */}
+              <div className="relative mb-4">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder={t('nav.search_placeholder')} className="pl-10 bg-muted/50" />
+              </div>
+
+              {/* Navigation Links */}
+              {navItems.map((item) =>
                 item.isLink ? (
                   <Button
                     key={item.name}
@@ -251,38 +273,32 @@ const Navigation = () => {
                     </a>
                   </Button>
                 )
-              ))}
+              )}
+
+              {/* Mobile Language Selector */}
+              <div className="mb-3">
+                <div className="text-xs text-muted-foreground mb-2">Language</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {languages.map((lang) => (
+                    <Button
+                      key={lang.code}
+                      size="sm"
+                      variant={language === lang.code ? "default" : "outline"}
+                      onClick={() => handleLanguageChange(lang)}
+                      className="text-xs"
+                    >
+                      {lang.native}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile Action Buttons */}
               <div className="pt-2 mt-2 border-t border-border">
-                <div className="relative mb-3">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder={t('nav.search_placeholder')}
-                    className="pl-10 bg-muted/50"
-                  />
-                </div>
-                
-                {/* Mobile Language Selector */}
-                <div className="mb-3">
-                  <div className="text-xs text-muted-foreground mb-2">Language</div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {languages.map((lang) => (
-                      <Button
-                        key={lang.code}
-                        size="sm"
-                        variant={language === lang.code ? "default" : "outline"}
-                        onClick={() => handleLanguageChange(lang)}
-                        className="text-xs"
-                      >
-                        {lang.native}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                
                 <div className="flex flex-wrap gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
+                  <Button
+                    size="sm"
+                    variant="outline"
                     className="gap-2"
                     onClick={() => setIsVoiceSearchOpen(true)}
                   >
@@ -300,6 +316,21 @@ const Navigation = () => {
                   </Button>
                 </div>
               </div>
+
+              {/* Mobile Logout Option */}
+              {currentUser && (
+                <div className="pt-2 mt-2 border-t border-border">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleLogout}
+                    className="w-full justify-start"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}

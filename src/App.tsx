@@ -8,14 +8,17 @@ import { SearchProvider } from "@/contexts/SearchContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
 import Index from "./pages/Index";
-import Children from "./pages/Children";
-import Marketplace from "./pages/Marketplace";
-import YourArtworks from "./pages/YourArtworks";
 import ARViewer from "./pages/ARViewer";
 import AllCollections from "./pages/AllCollections";
 import CollectionDetail from "./pages/CollectionDetail";
 import AllArtists from "./pages/AllArtists";
 import ArtistProfile from "./pages/ArtistProfile";
+import Children from "./pages/Children";
+import Marketplace from "./pages/Marketplace";
+import YourArtworks from "./pages/YourArtworks";
+import ExportCompliance from "./components/ExportCompliance";
+import ArtistBadging from "./components/ArtistBadging";
+import PaymentPage from "./components/marketplace/PaymentPage";
 import NotFound from "./pages/NotFound";
 import AuthDemo from "./pages/AuthDemo";
 
@@ -44,10 +47,13 @@ const App = () => (
                 <Route path="/collections/:id" element={<CollectionDetail />} />
                 <Route path="/artists" element={<AllArtists />} />
                 <Route path="/artists/:id" element={<ArtistProfile />} />
-                <Route path="/auth-demo" element={<AuthDemo />} />
                 <Route path="/children" element={<Children />} />
                 <Route path="/artworks" element={<YourArtworks />} />
                 <Route path="/marketplace" element={<Marketplace />} />
+                <Route path="/export-compliance" element={<ExportCompliance />} />
+                <Route path="/artist-badging" element={<ArtistBadging />} />
+                <Route path="/auth-demo" element={<AuthDemo />} />
+                <Route path="/payment" element={<PaymentPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

@@ -23,7 +23,7 @@ const translations = {
     'nav.collections': 'Collections',
     'nav.artists': 'Artists',
     'nav.museum_tours': 'Museum Tours',
-    'nav.children': 'Learn',
+    'nav.children': 'Children',
     'nav.store': 'Store',
     'nav.ar_experience': 'AR Experience',
     'nav.search_placeholder': 'Search artforms, artists...',
@@ -114,7 +114,7 @@ const translations = {
     'nav.collections': 'संग्रह',
     'nav.artists': 'कलाकार',
     'nav.museum_tours': 'संग्रहालय भ्रमण',
-    'nav.children': 'सीखें',
+    'nav.children': 'बच्चे',
     'nav.store': 'दुकान',
     'nav.ar_experience': 'एआर अनुभव',
     'nav.search_placeholder': 'कला रूपों, कलाकारों को खोजें...',
@@ -205,7 +205,7 @@ const translations = {
     'nav.collections': 'ಸಂಗ್ರಹಗಳು',
     'nav.artists': 'ಕಲಾವಿದರು',
     'nav.museum_tours': 'ಸಂಗ್ರಹಾಲಯ ಸುತ್ತಾಟ',
-    'nav.children': 'ಕಲಿಯಿರಿ',
+    'nav.children': 'ಮಕ್ಕಳು',
     'nav.store': 'ಅಂಗಡಿ',
     'nav.ar_experience': 'ಎಆರ್ ಅನುಭವ',
     'nav.search_placeholder': 'ಕಲಾ ರೂಪಗಳು, ಕಲಾವಿದರನ್ನು ಹುಡುಕಿ...',
@@ -228,7 +228,7 @@ const translations = {
 
     // Featured Artists
     'artists.title': 'ಮಾಸ್ಟರ್ ಕಲಾವಿದರು',
-    'artists.subtitle': 'ನಮ್ಮ ಸಾಂಸ್ಕೃತಿಕ ಪರಂಪರೆಯ ರಕ್ಷಕರೆ ಭೇಟಿ ಮಾಡಿ - ಸಾಂಪ്ರದಾಯಿಕ ಜಾನಪದ ಕಲಾ ರೂಪಗಳನ್ನು ಸಂರಕ್ಷಿಸಲು ಮತ್ತು ಉತ್ತೇಜಿಸಲು ತಮ್ಮ ಜೀವಿತವನ್ನು ಸಮರ್ಪಿಸಿರುವ ಪ್ರತಿಭാವಂತ ಕಲಾವಿದರು',
+    'artists.subtitle': 'ನಮ್ಮ ಸಾಂಸ್ಕೃತಿಕ ಪರಂಪರೆಯ ರಕ್ಷಕರನ್ನು ಭೇಟಿ ಮಾಡಿ - ಸಾಂಪ്ರದಾಯಿಕ ಜಾನಪದ ಕಲಾ ರೂಪಗಳನ್ನು ಸಂರಕ್ಷಿಸಲು ಮತ್ತು ಉತ್ತೇಜಿಸಲು ತಮ್ಮ ಜೀವಿತವನ್ನು ಸಮರ್ಪಿಸಿರುವ ಪ್ರತಿಭಾವಂತ ಕಲಾವಿದರು',
     'artists.discover_more': 'ಹೆಚ್ಚು ಕಲಾವಿದರನ್ನು ಅನ್ವೇಷಿಸಿ',
     'artists.view_profile': 'ಪ್ರೊಫೈಲ್ ನೋಡಿ',
     'artists.followers': 'ಅನುಯಾಯಿಗಳು',
@@ -244,14 +244,14 @@ const translations = {
     'highlights.global_access.description': 'ಜಗತ್ತಿನಲ್ಲಿ ಎಲ್ಲಿದ್ದರೂ, ನಿಮ್ಮ ಮನೆಗೆ ಭಾರತೀಯ ಜಾನಪದ ಕಲೆಯ ಸೌಂದರ്ಯವನ്ನു ತನ್ನಿ',
 
     // AR Experience
-    'ar.title': 'ಆಗ്ಮೆಂಟೆಡ് ರಿಯಾಲಿಱ്ಱಿ ಅನುಭವ',
+    'ar.title': 'ಆಗ್ಮೆಂಟೆಡ್ ರಿಯಾಲಿಱ്ಱಿ ಅನುಭವ',
     'ar.subtitle': 'ನಮ್ಮ ಅತ್ಯಾಧುನಿಕ ಎಆರ್ ತಂತ್ರಜ್ಞಾನದೊಂದಿಗೆ ನಿಮ್ಮ ಸ್ಥಳದಲ್ಲಿ ಭಾರತೀಯ ಜಾನಪದ ಕಲೆಯನ್ನು ಜೀವಂತಗೊಳಿಸಿ',
     'ar.try_ar': 'ಎಆರ್ ಅನುಭವವನ್ನು ಪ್ರಯತ್ನಿಸಿ',
     'ar.learn_more': 'ಹೆಚ್ಚು ತಿಳಿಯಿರಿ',
 
     // Personalized Recommendations
     'recommendations.title': 'ವೈಯಕ್ತಿಕ ಶಿಫಾರಸುಗಳು',
-    'recommendations.subtitle': 'ಎಐ ನಿಮ್ಮ ಸ್ಥಳಕ್ಕಾಗಿ ಪರಿಪೂರ್ಣ ಭಾರತೀಯ ಜಾನಪದ ಕಲಾಕೃತಿಗಳെ ಕಂಡುಹಿಡಿಯಲು ಅನುಮತಿಸಿ. ನಿಮ್ಮ ಆದ್ಯತೆಗಳ ಬಗ್ಗೆ ನಮಗೆ ಹೇಳಿ ಮತ್ತು ನಾವು ನಿಮ್ಮ ಶೈಲಿಗെ ಹೊಂದಾಣಿಕെಯಾಗುವ ತುಣುಕುಗಳನ್ನು ಶಿಫಾರಸು ಮಾಡುತ್ತೇವೆ',
+    'recommendations.subtitle': 'ಎಐ ನಿಮ್ಮ ಸ್ಥಳಕ್ಕಾಗಿ ಪರಿಪೂರ್ಣ ಭಾರತೀಯ ಜಾನಪದ ಕಲಾಕೃತಿಗಳು ಕಂಡುಹಿಡಿಯಲು ಅನುಮತಿಸಿ. ನಿಮ್ಮ ಆದ್ಯತೆಗಳ ಬಗ್ಗೆ ನಮಗೆ ಹೇಳಿ ಮತ್ತು ನಾವು ನಿಮ್ಮ ಶೈಲಿಗെ ಹೊಂದಾಣಿಕെಯಾಗುವ ತುಣುಕುಗಳನ್ನು ಶಿಫಾರಸು ಮಾಡುತ್ತೇವೆ',
     'recommendations.learn_more': 'ಹೆಚ್ಚು ತಿಳಿಯಿರಿ',
     'recommendations.step1.title': 'ನಿಮಗೆ ಯಾವ ಕಲಾ ರೂಪಗಳು ಇಷ್ಟ?',
     'recommendations.step1.subtitle': 'ನಿಮ್ಮ ನೆಚ್ಚಿನ ಭಾರತೀಯ ಜಾನಪದ ಕಲಾ ರೂಪಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ',
@@ -296,7 +296,7 @@ const translations = {
     'nav.collections': 'ശേഖരങ്ങൾ',
     'nav.artists': 'കലാകാരന്മാർ',
     'nav.museum_tours': 'മ്യൂസിയം ടൂറുകൾ',
-    'nav.children': 'പഠിക്കുക',
+    'nav.children': 'കുട്ടികൾ',
     'nav.store': 'സ്റ്റോർ',
     'nav.ar_experience': 'എആർ അനുഭവം',
     'nav.search_placeholder': 'കലാ രൂപങ്ങൾ, കലാകാരന്മാരെ തിരയുക...',
