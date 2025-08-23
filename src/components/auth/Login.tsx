@@ -5,8 +5,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { Mail, Lock, Phone, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Phone, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import OTPVerification from './OTPVerification';
 
 interface LoginProps {
   onSwitchToSignup: () => void;
@@ -14,29 +15,68 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onClose }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('email');
+  const [activeTab, setActiveTab] = useState('google');
+  const [showOTP, setShowOTP] = useState(false);
+  const [verificationId, setVerificationId] = useState('');
 
-  const { login, loginWithGoogle } = useAuth();
+  const { loginWithPhone, verifyOTP, loginWithGoogle } = useAuth();
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
+  const handlePhoneLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast.error('Please fill in all fields');
+    if (!phoneNumber) {
+      toast.error('Please enter your phone number');
       return;
     }
 
+    // Format phone number to include country code if not present
+    let formattedPhone = phoneNumber;
+    if (!phoneNumber.startsWith('+')) {
+      formattedPhone = '+91' + phoneNumber; // Default to India (+91)
+    }
+
+    console.log('Attempting phone login with:', formattedPhone);
     setIsLoading(true);
+    
+    // Add timeout to prevent hanging
+    const timeoutId = setTimeout(() => {
+      setIsLoading(false);
+      toast.error('Request timed out. Please try again.');
+    }, 30000); // 30 seconds timeout
+    
     try {
-      await login(email, password);
-      toast.success('Login successful!');
-      onClose();
+      const result = await loginWithPhone(formattedPhone);
+      clearTimeout(timeoutId);
+      console.log('Phone login result:', result);
+      setVerificationId(result.verificationId);
+      setShowOTP(true);
+      toast.success('OTP sent successfully!');
     } catch (error: any) {
-      toast.error(error.message || 'Login failed');
+      clearTimeout(timeoutId);
+      console.error('Phone login error:', error);
+      let errorMessage = 'Failed to send OTP';
+      
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/invalid-phone-number':
+            errorMessage = 'Invalid phone number format';
+            break;
+          case 'auth/too-many-requests':
+            errorMessage = 'Too many requests. Please try again later';
+            break;
+          case 'auth/quota-exceeded':
+            errorMessage = 'SMS quota exceeded. Please try again later';
+            break;
+          case 'auth/network-request-failed':
+            errorMessage = 'Network error. Please check your connection';
+            break;
+          default:
+            errorMessage = error.message || 'Failed to send OTP';
+        }
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -55,17 +95,30 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onClose }) => {
     }
   };
 
-  const handlePhoneLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!phoneNumber) {
-      toast.error('Please enter your phone number');
-      return;
+  const handleOTPVerification = async (otp: string) => {
+    try {
+      await verifyOTP(verificationId, otp);
+      toast.success('Phone verification successful!');
+      onClose();
+    } catch (error: any) {
+      toast.error(error.message || 'OTP verification failed');
     }
-
-    // For phone authentication, you would typically integrate with Firebase Phone Auth
-    // For now, we'll show a placeholder message
-    toast.info('Phone authentication will be implemented with Firebase Phone Auth');
   };
+
+  const handleBackToPhone = () => {
+    setShowOTP(false);
+    setVerificationId('');
+  };
+
+  if (showOTP) {
+    return (
+      <OTPVerification
+        phoneNumber={phoneNumber}
+        onBack={handleBackToPhone}
+        onSuccess={handleOTPVerification}
+      />
+    );
+  }
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -77,99 +130,10 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onClose }) => {
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="email">Email</TabsTrigger>
-            <TabsTrigger value="phone">Phone</TabsTrigger>
-            <TabsTrigger value="google">Google</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="google">Google (Free)</TabsTrigger>
+            <TabsTrigger value="phone">Phone (Billing Required)</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="email" className="space-y-4">
-            <form onSubmit={handleEmailLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  'Sign In'
-                )}
-              </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="phone" className="space-y-4">
-            <form onSubmit={handlePhoneLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sending OTP...
-                  </>
-                ) : (
-                  'Send OTP'
-                )}
-              </Button>
-            </form>
-          </TabsContent>
 
           <TabsContent value="google" className="space-y-4">
             <Button
@@ -207,6 +171,51 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onClose }) => {
                 </>
               )}
             </Button>
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                Google Sign-in is completely free and doesn't require billing setup
+              </p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="phone" className="space-y-4">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
+              <p className="text-xs text-amber-800">
+                <strong>⚠️ Billing Required:</strong> Phone authentication requires Firebase billing to be enabled.
+                <br />
+                <span className="text-amber-700">💡 Recommendation: Use Google Sign-in above (completely free)</span>
+              </p>
+            </div>
+            <form onSubmit={handlePhoneLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  We'll send you a 6-digit verification code
+                </p>
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending OTP...
+                  </>
+                ) : (
+                  'Send OTP'
+                )}
+              </Button>
+            </form>
           </TabsContent>
         </Tabs>
 
@@ -221,6 +230,34 @@ const Login: React.FC<LoginProps> = ({ onSwitchToSignup, onClose }) => {
             </button>
           </p>
         </div>
+
+        {/* Hidden reCAPTCHA container for Firebase Phone Auth */}
+        <div id="recaptcha-container" className="hidden"></div>
+        
+        {/* Debug info - remove in production */}
+        {import.meta.env.DEV && (
+          <div className="mt-4 p-3 bg-muted rounded text-xs text-muted-foreground">
+            <p>Debug Info:</p>
+            <p>Firebase API Key: {import.meta.env.VITE_FIREBASE_API_KEY ? 'Set' : 'Not set'}</p>
+            <p>Firebase Project ID: {import.meta.env.VITE_FIREBASE_PROJECT_ID ? 'Set' : 'Not set'}</p>
+            <p>Phone Number: {phoneNumber}</p>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                console.log('Testing Firebase connection...');
+                console.log('Environment variables:', {
+                  VITE_FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY,
+                  VITE_FIREBASE_PROJECT_ID: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+                  VITE_FIREBASE_AUTH_DOMAIN: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN
+                });
+              }}
+              className="mt-2"
+            >
+              Test Firebase Connection
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
