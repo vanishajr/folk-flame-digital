@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Menu, X, Mic, Search, User, ShoppingBag, Map, Camera, LogIn, LogOut } from "lucide-react";
+import { Menu, X, Mic, Search, User, ShoppingBag, Map, Camera, LogIn, LogOut, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
@@ -9,17 +9,32 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSearch } from "@/contexts/SearchContext";
 import AuthModal from "@/components/auth/AuthModal";
 import VoiceSearchModal from "@/components/VoiceSearchModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "react-hot-toast";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isVoiceSearchOpen, setIsVoiceSearchOpen] = useState(false);
   const [authView, setAuthView] = useState<"login" | "signup" | "profile">("login");
-  const { currentUser, userProfile } = useAuth();
+  const { currentUser, userProfile, logout } = useAuth();
   const { performSearch } = useSearch();
 
   const [showAuthModal, setShowAuthModal] = useState(false);
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+    } catch (error) {
+      toast.error('Failed to logout');
+    }
+  };
 
   const navItems = [
     { name: "Explore", href: "/", isLink: false },
@@ -109,28 +124,35 @@ const Navigation = () => {
             {/* User Authentication */}
 
             {currentUser ? (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setAuthView("profile");
-                  setIsAuthModalOpen(true);
-                }}
-                className="flex items-center space-x-2"
-              >
-                <Avatar className="h-6 w-6">
-                  <AvatarImage
-                    src={userProfile?.photoURL}
-                    alt={userProfile?.displayName || "User"}
-                  />
-                  <AvatarFallback className="text-xs">
-                    {userProfile?.displayName
-                      ? userProfile.displayName.charAt(0).toUpperCase()
-                      : "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="hidden lg:inline">{userProfile?.displayName || "User"}</span>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex items-center space-x-2"
+                  >
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage
+                        src={userProfile?.photoURL}
+                        alt={userProfile?.displayName || "User"}
+                      />
+                      <AvatarFallback className="text-xs">
+                        {userProfile?.displayName
+                          ? userProfile.displayName.charAt(0).toUpperCase()
+                          : "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="hidden lg:inline">{userProfile?.displayName || "User"}</span>
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Button
                 size="sm"
@@ -220,6 +242,21 @@ const Navigation = () => {
                   </Button>
                 </div>
               </div>
+
+              {/* Mobile Logout Option */}
+              {currentUser && (
+                <div className="pt-2 mt-2 border-t border-border">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleLogout}
+                    className="w-full justify-start"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}

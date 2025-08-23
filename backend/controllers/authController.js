@@ -2,6 +2,7 @@
 const mockUsers = [
   {
     id: '1',
+    uid: 'demo-user-1',
     username: 'demo_user',
     email: 'demo@example.com',
     password: 'password123',
@@ -26,6 +27,126 @@ const generateMockToken = (user) => {
   return `mock_jwt_token_${user.id}_${Date.now()}`;
 };
 
+// Google login endpoint
+const googleLogin = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    
+    if (!idToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Firebase ID token is required'
+      });
+    }
+
+    // In a real implementation, this would be handled by the firebaseAuth middleware
+    // For now, we'll simulate the token verification
+    console.log('🔐 Processing Google login with Firebase ID token');
+    
+    // Mock user data for demo (in real app, this comes from Firebase)
+    const mockFirebaseUser = {
+      uid: 'google-user-' + Date.now(),
+      email: 'user@gmail.com',
+      emailVerified: true,
+      displayName: 'Google User',
+      photoURL: 'https://via.placeholder.com/150',
+      providerId: 'google.com'
+    };
+
+    // Check if user exists in our system
+    let user = mockUsers.find(u => u.uid === mockFirebaseUser.uid);
+    
+    if (!user) {
+      // Create new user
+      user = {
+        id: (mockUsers.length + 1).toString(),
+        uid: mockFirebaseUser.uid,
+        username: mockFirebaseUser.displayName?.toLowerCase().replace(/\s+/g, '_') || 'user',
+        email: mockFirebaseUser.email,
+        profile: {
+          displayName: mockFirebaseUser.displayName || 'New User',
+          avatar: mockFirebaseUser.photoURL || 'https://via.placeholder.com/150',
+          parentEmail: null
+        },
+        gameStats: {
+          totalScore: 0,
+          gamesPlayed: 0,
+          averageScore: 0,
+          modulesCompleted: 0,
+          achievements: [],
+          lastActive: new Date().toISOString()
+        }
+      };
+      
+      mockUsers.push(user);
+      console.log('✅ New user created:', user.profile.displayName);
+    } else {
+      // Update last login
+      user.gameStats.lastActive = new Date().toISOString();
+      console.log('✅ Existing user logged in:', user.profile.displayName);
+    }
+
+    // Generate session token
+    const token = generateMockToken(user);
+    
+    res.json({
+      success: true,
+      message: 'Google login successful',
+      data: {
+        user: { ...user, password: undefined },
+        token,
+        isNewUser: !user.gameStats.gamesPlayed // Check if this is a new user
+      }
+    });
+  } catch (error) {
+    console.error('Google login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Verify Firebase token endpoint
+const verifyToken = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    
+    if (!idToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Firebase ID token is required'
+      });
+    }
+
+    // In a real implementation, this would verify the token with Firebase Admin
+    console.log('🔐 Verifying Firebase ID token');
+    
+    // Mock verification for demo
+    const mockVerifiedUser = {
+      uid: 'verified-user-' + Date.now(),
+      email: 'verified@gmail.com',
+      emailVerified: true,
+      displayName: 'Verified User',
+      photoURL: 'https://via.placeholder.com/150'
+    };
+
+    res.json({
+      success: true,
+      message: 'Token verified successfully',
+      data: {
+        user: mockVerifiedUser
+      }
+    });
+  } catch (error) {
+    console.error('Token verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
 const register = async (req, res) => {
   try {
     const { username, email, password, parentEmail } = req.body;
@@ -42,6 +163,7 @@ const register = async (req, res) => {
     // Create new user
     const newUser = {
       id: (mockUsers.length + 1).toString(),
+      uid: 'local-user-' + Date.now(),
       username,
       email,
       password,
@@ -178,6 +300,8 @@ const updateProfile = async (req, res) => {
 module.exports = {
   register,
   login,
+  googleLogin,
+  verifyToken,
   getProfile,
   updateProfile
 };

@@ -20,7 +20,7 @@ import {
   Medal
 } from "lucide-react";
 import { useGames, useLearningModules, useLeaderboard, useSubmitScore, useArtFacts } from "@/hooks/useContent";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Game {
   id: string;

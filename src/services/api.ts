@@ -1,97 +1,106 @@
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data?: T;
-  error?: string;
-}
-
-class ApiService {
-  private getAuthHeaders(): HeadersInit {
-    const token = localStorage.getItem('authToken');
-    return {
+// Helper function to make API calls
+const apiCall = async (endpoint: string, options: RequestInit = {}) => {
+  const url = `${API_BASE_URL}${endpoint}`;
+  
+  const defaultOptions: RequestInit = {
+    headers: {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` })
-    };
-  }
+      ...options.headers,
+    },
+    credentials: 'include',
+    ...options,
+  };
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
-    try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        headers: this.getAuthHeaders(),
-        ...options
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'API request failed');
-      }
-
-      return data;
-    } catch (error) {
-      console.error('API Error:', error);
-      throw error;
-    }
-  }
-
-  // Auth API
-  async register(userData: {
-    username: string;
-    email: string;
-    password: string;
-    parentEmail?: string;
-  }) {
-    return this.request('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(userData)
-    });
-  }
-
-  async login(credentials: { email: string; password: string }) {
-    const response = await this.request('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(credentials)
-    });
+  try {
+    const response = await fetch(url, defaultOptions);
     
-    if (response.success && response.data?.token) {
-      localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    return response;
+    return await response.json();
+  } catch (error) {
+    console.error(`API call failed for ${endpoint}:`, error);
+    throw error;
   }
+};
 
-  async logout() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-  }
+// Authentication API calls
+export const authAPI = {
+  // Google login with Firebase ID token
+  googleLogin: async (idToken: string) => {
+    return apiCall('/api/auth/google-login', {
+      method: 'POST',
+      body: JSON.stringify({ idToken }),
+    });
+  },
 
-  async getProfile() {
-    return this.request('/auth/profile');
-  }
+  // Verify Firebase token
+  verifyToken: async (idToken: string) => {
+    return apiCall('/api/auth/verify-token', {
+      method: 'POST',
+      body: JSON.stringify({ idToken }),
+    });
+  },
 
-  async updateProfile(profileData: {
-    displayName?: string;
-    avatar?: string;
-    parentEmail?: string;
-  }) {
-    return this.request('/auth/profile', {
+  // Get user profile (protected route)
+  getProfile: async (token?: string) => {
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return apiCall('/api/auth/profile', {
+      method: 'GET',
+      headers,
+    });
+  },
+
+  // Update user profile (protected route)
+  updateProfile: async (data: any, token?: string) => {
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return apiCall('/api/auth/profile', {
       method: 'PUT',
-      body: JSON.stringify(profileData)
+      headers,
+      body: JSON.stringify(data),
     });
-  }
+  },
 
-  // Content API
-  async getGames(filters?: {
+  // Traditional login
+  login: async (email: string, password: string) => {
+    return apiCall('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+  },
+
+  // Traditional registration
+  register: async (userData: any) => {
+    return apiCall('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+  },
+};
+
+// Content API calls
+export const contentAPI = {
+  getContent: async () => {
+    return apiCall('/api/content');
+  },
+
+  // Get games with optional filters
+  getGames: async (filters?: {
     artForm?: string;
     difficulty?: string;
     category?: string;
-  }) {
+  }) => {
     const params = new URLSearchParams();
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
@@ -99,70 +108,109 @@ class ApiService {
       });
     }
     
-    return this.request(`/content/games?${params}`);
-  }
+    return apiCall(`/api/content/games?${params}`);
+  },
 
-  async getLearningModules(artForm?: string) {
+  // Get learning modules
+  getLearningModules: async (artForm?: string) => {
     const params = artForm ? `?artForm=${artForm}` : '';
-    return this.request(`/content/learning-modules${params}`);
-  }
+    return apiCall(`/api/content/learning-modules${params}`);
+  },
 
-  async getArtFacts(artForm: string) {
-    return this.request(`/content/art-facts/${artForm}`);
-  }
+  // Get art facts
+  getArtFacts: async (artForm: string) => {
+    return apiCall(`/api/content/art-facts/${artForm}`);
+  },
 
-  async getQuiz(artForm?: string, limit?: number) {
+  // Get quiz questions
+  getQuiz: async (artForm?: string, limit?: number) => {
     const params = new URLSearchParams();
     if (artForm) params.append('artForm', artForm);
     if (limit) params.append('limit', limit.toString());
     
-    return this.request(`/content/quiz?${params}`);
-  }
+    return apiCall(`/api/content/quiz?${params}`);
+  },
 
-  async getContentById(id: string) {
-    return this.request(`/content/${id}`);
-  }
+  // Get content by ID
+  getContentById: async (id: string) => {
+    return apiCall(`/api/content/${id}`);
+  },
+};
 
-  // Leaderboard API
-  async getLeaderboard(limit?: number, artForm?: string) {
+// Leaderboard API calls
+export const leaderboardAPI = {
+  getLeaderboard: async (limit?: number, artForm?: string) => {
     const params = new URLSearchParams();
     if (limit) params.append('limit', limit.toString());
     if (artForm) params.append('artForm', artForm);
     
-    return this.request(`/leaderboard?${params}`);
-  }
+    return apiCall(`/api/leaderboard?${params}`);
+  },
 
-  async getArtFormLeaderboard(artForm: string, limit?: number) {
+  // Get art form specific leaderboard
+  getArtFormLeaderboard: async (artForm: string, limit?: number) => {
     const params = limit ? `?limit=${limit}` : '';
-    return this.request(`/leaderboard/artform/${artForm}${params}`);
-  }
+    return apiCall(`/api/leaderboard/artform/${artForm}${params}`);
+  },
 
-  async submitScore(scoreData: {
+  // Submit score
+  submitScore: async (scoreData: {
     contentId: string;
     score: number;
     maxScore: number;
     timeSpent: number;
-  }) {
-    return this.request('/leaderboard/submit-score', {
+  }) => {
+    return apiCall('/api/leaderboard/submit-score', {
       method: 'POST',
-      body: JSON.stringify(scoreData)
+      body: JSON.stringify(scoreData),
     });
-  }
+  },
 
-  async getUserRank() {
-    return this.request('/leaderboard/my-rank');
-  }
+  // Get user rank
+  getUserRank: async () => {
+    return apiCall('/api/leaderboard/my-rank');
+  },
+};
+
+// Legacy API service for backward compatibility
+export const apiService = {
+  // Auth methods
+  register: authAPI.register,
+  login: authAPI.login,
+  getProfile: authAPI.getProfile,
+  updateProfile: authAPI.updateProfile,
+  logout: () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+  },
+
+  // Content methods
+  getGames: contentAPI.getGames,
+  getLearningModules: contentAPI.getLearningModules,
+  getArtFacts: contentAPI.getArtFacts,
+  getQuiz: contentAPI.getQuiz,
+  getContentById: contentAPI.getContentById,
+
+  // Leaderboard methods
+  getLeaderboard: leaderboardAPI.getLeaderboard,
+  getArtFormLeaderboard: leaderboardAPI.getArtFormLeaderboard,
+  submitScore: leaderboardAPI.submitScore,
+  getUserRank: leaderboardAPI.getUserRank,
 
   // Utility methods
-  isAuthenticated(): boolean {
-    return !!localStorage.getItem('authToken');
-  }
+  isAuthenticated: (): boolean => {
+    return !!localStorage.getItem('authToken') || !!localStorage.getItem('backendToken');
+  },
 
-  getCurrentUser() {
+  getCurrentUser: () => {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
-  }
-}
+  },
+};
 
-export const apiService = new ApiService();
-export default apiService;
+export default {
+  auth: authAPI,
+  content: contentAPI,
+  leaderboard: leaderboardAPI,
+  apiService, // Export for backward compatibility
+};
