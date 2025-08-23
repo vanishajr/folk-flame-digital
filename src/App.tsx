@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Children from "./pages/Children";
 import Marketplace from "./pages/Marketplace";
+import YourArtworks from "./pages/YourArtworks";
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SearchProvider } from "@/contexts/SearchContext";
@@ -53,6 +54,7 @@ const App = () => (
 
               <Route path="/auth-demo" element={<AuthDemo />} />
               <Route path="/children" element={<Children />} />
+              <Route path="/artworks" element={<YourArtworks />} />
               <Route path="/marketplace" element={<Marketplace />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
