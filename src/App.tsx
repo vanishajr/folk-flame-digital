@@ -15,7 +15,10 @@ import Marketplace from "./pages/Marketplace";
 import YourArtworks from "./pages/YourArtworks";
 import { Toaster as HotToaster } from "react-hot-toast";
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> ffb9480 (WIP: local changes)
 import ARViewer from "./pages/ARViewer";
 import AllCollections from "./pages/AllCollections";
 import CollectionDetail from "./pages/CollectionDetail";
@@ -41,6 +44,7 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+<<<<<<< HEAD
 
     <LanguageProvider>
       <AuthProvider>
@@ -73,6 +77,32 @@ const App = () => (
       </AuthProvider>
     </LanguageProvider>
 
+=======
+    <AuthProvider>
+      <SearchProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <HotToaster />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/ar-viewer" element={<ARViewer />} />
+              <Route path="/collections" element={<AllCollections />} />
+              <Route path="/collections/:id" element={<CollectionDetail />} />
+              <Route path="/artists" element={<AllArtists />} />
+              <Route path="/artists/:id" element={<ArtistProfile />} />
+              <Route path="/auth-demo" element={<AuthDemo />} />
+              <Route path="/children" element={<Children />} />
+              <Route path="/artworks" element={<YourArtworks />} />
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </SearchProvider>
+    </AuthProvider>
+>>>>>>> ffb9480 (WIP: local changes)
   </QueryClientProvider>
 );
 
