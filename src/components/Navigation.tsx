@@ -147,6 +147,14 @@ const Navigation = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  {/* ✅ Your Artworks button */}
+                  <DropdownMenuItem asChild>
+                    <Link to="/artworks">
+                      <User className="mr-2 h-4 w-4" />
+                      Your Artworks
+                    </Link>
+                  </DropdownMenuItem>
+
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
@@ -164,11 +172,10 @@ const Navigation = () => {
                 className="flex items-center space-x-2"
               >
                 <LogIn className="h-4 w-4" />
-
                 <span className="hidden lg:inline">Sign In</span>
-
               </Button>
             )}
+
 
             {/* Mobile Menu Button */}
             <Button
