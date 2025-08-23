@@ -9,7 +9,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSearch } from "@/contexts/SearchContext";
 import AuthModal from "@/components/auth/AuthModal";
 import VoiceSearchModal from "@/components/VoiceSearchModal";
-import AuthModal from "./AuthModal";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,9 +17,6 @@ const Navigation = () => {
   const [authView, setAuthView] = useState<'login' | 'signup' | 'profile'>('login');
   const { currentUser, userProfile } = useAuth();
   const { performSearch } = useSearch();
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const { user, isAuthenticated, logout } = useAuth();
-
 
   const navItems = [
     { name: "Explore", href: "/", isLink: false },
@@ -28,6 +24,7 @@ const Navigation = () => {
     { name: "Artists", href: "#artists", isLink: false },
     { name: "Museum Tours", href: "#tours", isLink: false },
     { name: "Children", href: "/children", isLink: true },
+    { name: "Marketplace", href: "/marketplace", isLink: true },
     { name: "Store", href: "#store", isLink: false },
     { name: "AR Experience", href: "#ar", isLink: false },
   ];
@@ -101,19 +98,6 @@ const Navigation = () => {
               <ShoppingBag className="h-4 w-4" />
             </Button>
 
-            {isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-amber-800">
-                  {user?.profile.displayName || user?.username}
-                </span>
-                <Button size="sm" variant="outline" onClick={logout}>
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              <Button size="sm" variant="outline" onClick={() => setShowAuthModal(true)}>
-                <User className="h-4 w-4" />
-
             {currentUser ? (
               <Button
                 size="sm"
@@ -144,7 +128,6 @@ const Navigation = () => {
               >
                 <LogIn className="h-4 w-4" />
                 <span className="hidden sm:inline">Sign In</span>
-
               </Button>
             )}
           </div>
@@ -222,7 +205,6 @@ const Navigation = () => {
           </div>
         )}
       </div>
-
 
       {/* Authentication Modal */}
       <AuthModal
