@@ -67,6 +67,36 @@ const Children = () => {
   const [showLearningPage, setShowLearningPage] = useState(false);
   const [selectedModule, setSelectedModule] = useState<LearningModule | null>(null);
 
+  // Madhubani art guessing game state
+  const [currentMadhubaniQuestion, setCurrentMadhubaniQuestion] = useState(0);
+  const [madhubaniScore, setMadhubaniScore] = useState(0);
+  const [showMadhubaniResult, setShowMadhubaniResult] = useState(false);
+  const [showMadhubaniCelebration, setShowMadhubaniCelebration] = useState(false);
+
+  // Pithora bead game state (same as Warli)
+  const [pithoraBeads, setPithoraBeads] = useState<string[]>([]);
+  const [targetPithoraPattern, setTargetPithoraPattern] = useState<string[]>([]);
+  const [draggedPithoraBead, setDraggedPithoraBead] = useState<string | null>(null);
+  const [showPithoraCelebration, setShowPithoraCelebration] = useState(false);
+
+  // Folk Art Quiz state
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<string[]>([]);
+  const [showQuizResult, setShowQuizResult] = useState(false);
+  const [quizScore, setQuizScore] = useState(0);
+
+  // Art Form Memory Game state
+  const [memoryCards, setMemoryCards] = useState<string[]>([]);
+  const [flippedCards, setFlippedCards] = useState<number[]>([]);
+  const [matchedPairs, setMatchedPairs] = useState<number[]>([]);
+  const [showMemoryCelebration, setShowMemoryCelebration] = useState(false);
+
+  // Creative Art Studio state
+  const [drawingCanvas, setDrawingCanvas] = useState<string[][]>([]);
+  const [selectedTool, setSelectedTool] = useState<string>('brush');
+  const [selectedColorStudio, setSelectedColorStudio] = useState<string>('#8B4513');
+  const [showStudioCelebration, setShowStudioCelebration] = useState(false);
+
   // Backend data hooks
   const { data: gamesData, isLoading: gamesLoading } = useGames();
   const { data: modulesData, isLoading: modulesLoading } = useLearningModules();
@@ -90,11 +120,11 @@ const Children = () => {
     },
     {
       id: '2',
-      title: 'Madhubani Color Quest',
-      description: 'Learn about Madhubani painting colors and create beautiful patterns',
+      title: 'Madhubani Art Detective',
+      description: 'Guess different types of Madhubani art forms and learn about their unique characteristics',
       ageGroup: 'all',
       difficulty: 'beginner',
-      category: 'creative',
+      category: 'quiz',
       estimatedTime: 8,
       artForm: 'Madhubani',
       isCompleted: false,
@@ -103,11 +133,11 @@ const Children = () => {
     },
     {
       id: '3',
-      title: 'Pithora Art Puzzle',
-      description: 'Solve puzzles featuring Pithora art and learn about tribal culture',
+      title: 'Pithora Art Pattern Match',
+      description: 'Match traditional Pithora art patterns and learn about tribal culture',
       ageGroup: 'all',
       difficulty: 'intermediate',
-      category: 'puzzle',
+      category: 'memory',
       estimatedTime: 10,
       artForm: 'Pithora',
       isCompleted: false,
@@ -294,6 +324,65 @@ const Children = () => {
     "The art form is passed down from generation to generation through oral tradition."
   ];
 
+  // Folk Art Quiz Questions
+  const quizQuestions = [
+    {
+      question: "Which art form is known for its white geometric patterns on red ochre background?",
+      options: ["Madhubani", "Warli", "Pithora", "Gond"],
+      correct: "Warli",
+      fact: "Warli art uses simple geometric shapes like circles, triangles, and squares to tell stories!"
+    },
+    {
+      question: "Madhubani paintings traditionally depict which themes?",
+      options: ["Tribal life", "Hindu deities", "Nature scenes", "Modern art"],
+      correct: "Hindu deities",
+      fact: "Madhubani art often features Hindu gods, goddesses, and mythological stories!"
+    },
+    {
+      question: "Pithora art is considered sacred and is used during what?",
+      options: ["Daily activities", "Religious ceremonies", "Modern exhibitions", "Children's games"],
+      correct: "Religious ceremonies",
+      fact: "Pithora art is a sacred tribal art form used in important ceremonies and rituals!"
+    }
+  ];
+
+  // Madhubani Art Guessing Questions
+  const madhubaniQuestions = [
+    {
+      question: "What type of Madhubani art is this?",
+      image: "🎭",
+      options: ["Kohbar (Wedding)", "Aripan (Floor)", "Godna (Body)", "Bhitti (Wall)"],
+      correct: "Kohbar (Wedding)",
+      fact: "Kohbar paintings are created during weddings and feature symbols of fertility and prosperity!"
+    },
+    {
+      question: "Identify this Madhubani art style:",
+      image: "🏛️",
+      options: ["Bhitti (Wall)", "Aripan (Floor)", "Kohbar (Wedding)", "Godna (Body)"],
+      correct: "Bhitti (Wall)",
+      fact: "Bhitti paintings are created on walls and often depict scenes from Hindu mythology!"
+    },
+    {
+      question: "What is this Madhubani art form called?",
+      image: "🌺",
+      options: ["Aripan (Floor)", "Kohbar (Wedding)", "Bhitti (Wall)", "Godna (Body)"],
+      correct: "Aripan (Floor)",
+      fact: "Aripan is floor art created during festivals and ceremonies using rice paste!"
+    },
+    {
+      question: "Which Madhubani art type is this?",
+      image: "👁️",
+      options: ["Godna (Body)", "Bhitti (Wall)", "Aripan (Floor)", "Kohbar (Wedding)"],
+      correct: "Godna (Body)",
+      fact: "Godna is traditional body art using natural dyes, often applied during festivals!"
+    }
+  ];
+
+  // Art form pairs for memory game
+  const artFormPairs = [
+    "🏺", "🎨", "🏛️", "🌳", "🧵", "🗺️", "🎭", "🧩"
+  ];
+
   const handleGameStart = async (game: Game) => {
     setActiveGame(game);
     setGameScore(0);
@@ -321,9 +410,22 @@ const Children = () => {
       setShowArtFact(true);
     }
     
-    // Initialize Warli bead game if it's the Warli pattern match game
+    // Initialize specific games based on title
     if (game.title === 'Warli Art Pattern Match') {
       initializeWarliGame();
+    } else if (game.title === 'Madhubani Color Quest') {
+      initializeMadhubaniGame();
+    } else if (game.title === 'Pithora Art Puzzle') {
+      initializePithoraGame();
+    } else if (game.title === 'Folk Art Quiz Master') {
+      setCurrentQuestion(0);
+      setQuizScore(0);
+      setQuizAnswers([]);
+      setShowQuizResult(false);
+    } else if (game.title === 'Art Form Memory Game') {
+      initializeMemoryGame();
+    } else if (game.title === 'Creative Art Studio') {
+      initializeCreativeStudio();
     }
   };
 
@@ -334,6 +436,35 @@ const Children = () => {
     
     setTargetPattern(pattern);
     setWarliBeads(shuffledBeads);
+  };
+
+  const initializeMadhubaniGame = () => {
+    setCurrentMadhubaniQuestion(0);
+    setMadhubaniScore(0);
+    setShowMadhubaniResult(false);
+  };
+
+  const initializePithoraGame = () => {
+    const colors = ['#8B4513', '#D2691E', '#CD853F', '#F4A460', '#DEB887', '#F5DEB3'];
+    const pattern = Array.from({ length: 8 }, () => colors[Math.floor(Math.random() * colors.length)]);
+    const shuffledBeads = [...pattern].sort(() => Math.random() - 0.5);
+    
+    setTargetPithoraPattern(pattern);
+    setPithoraBeads(shuffledBeads);
+  };
+
+  const initializeMemoryGame = () => {
+    const cards = [...artFormPairs, ...artFormPairs].sort(() => Math.random() - 0.5);
+    setMemoryCards(cards);
+    setFlippedCards([]);
+    setMatchedPairs([]);
+  };
+
+  const initializeCreativeStudio = () => {
+    const canvas = Array.from({ length: 8 }, () => Array.from({ length: 8 }, () => '#FFFFFF'));
+    setDrawingCanvas(canvas);
+    setSelectedColorStudio('#8B4513');
+    setSelectedTool('brush');
   };
 
   const handleBeadDrop = (index: number, color: string) => {
@@ -362,6 +493,124 @@ const Children = () => {
       }
     }
     setDraggedBead(null);
+  };
+
+  // Madhubani Art Guessing Game Handlers
+  const handleMadhubaniAnswer = (answer: string) => {
+    const isCorrect = answer === madhubaniQuestions[currentMadhubaniQuestion].correct;
+    
+    if (isCorrect) {
+      setMadhubaniScore(prev => prev + 25);
+      setGameScore(prev => prev + 25);
+    }
+    
+    setShowMadhubaniResult(true);
+    
+    // Move to next question after showing result
+    setTimeout(() => {
+      setShowMadhubaniResult(false);
+      if (currentMadhubaniQuestion < madhubaniQuestions.length - 1) {
+        setCurrentMadhubaniQuestion(prev => prev + 1);
+      } else {
+        // Game complete
+        setShowMadhubaniCelebration(true);
+        setTimeout(() => {
+          setShowMadhubaniCelebration(false);
+          initializeMadhubaniGame();
+        }, 3000);
+      }
+    }, 2000);
+  };
+
+  // Pithora Pattern Game Handlers
+  const handlePithoraBeadDrop = (index: number, symbol: string) => {
+    const newBeads = [...pithoraBeads];
+    const draggedIndex = pithoraBeads.indexOf(symbol);
+    
+    if (draggedIndex !== -1) {
+      // Swap beads
+      [newBeads[index], newBeads[draggedIndex]] = [newBeads[draggedIndex], newBeads[index]];
+      setPithoraBeads(newBeads);
+      
+      // Check if pattern matches
+      if (JSON.stringify(newBeads) === JSON.stringify(targetPithoraPattern)) {
+        setGameScore(prev => prev + 150);
+        
+        // Show celebration
+        setShowPithoraCelebration(true);
+        
+        // Generate new pattern after celebration
+        setTimeout(() => {
+          setShowPithoraCelebration(false);
+          initializePithoraGame();
+        }, 3000);
+      }
+    }
+    setDraggedPithoraBead(null);
+  };
+
+  // Folk Art Quiz Handlers
+  const handleQuizAnswer = (answer: string) => {
+    const newAnswers = [...quizAnswers];
+    newAnswers[currentQuestion] = answer;
+    setQuizAnswers(newAnswers);
+    
+    if (answer === quizQuestions[currentQuestion].correct) {
+      setQuizScore(prev => prev + 50);
+    }
+    
+    if (currentQuestion < quizQuestions.length - 1) {
+      setCurrentQuestion(prev => prev + 1);
+    } else {
+      setShowQuizResult(true);
+      setGameScore(quizScore + (answer === quizQuestions[currentQuestion].correct ? 50 : 0));
+    }
+  };
+
+  // Memory Game Handlers
+  const handleMemoryCardClick = (index: number) => {
+    if (flippedCards.length === 2 || flippedCards.includes(index) || matchedPairs.includes(index)) {
+      return;
+    }
+    
+    const newFlipped = [...flippedCards, index];
+    setFlippedCards(newFlipped);
+    
+    if (newFlipped.length === 2) {
+      const [first, second] = newFlipped;
+      if (memoryCards[first] === memoryCards[second]) {
+        setMatchedPairs(prev => [...prev, first, second]);
+        setGameScore(prev => prev + 20);
+        
+        if (matchedPairs.length + 2 === memoryCards.length) {
+          setShowMemoryCelebration(true);
+          setTimeout(() => {
+            setShowMemoryCelebration(false);
+            initializeMemoryGame();
+          }, 3000);
+        }
+      } else {
+        setTimeout(() => {
+          setFlippedCards(flippedCards.filter(i => i !== first && i !== second));
+        }, 1000);
+      }
+    }
+  };
+
+  // Creative Studio Handlers
+  const handleCanvasClick = (row: number, col: number) => {
+    const newCanvas = [...drawingCanvas];
+    newCanvas[row][col] = selectedColorStudio;
+    setDrawingCanvas(newCanvas);
+  };
+
+  const handleSaveArtwork = () => {
+    setGameScore(prev => prev + 200);
+    setShowStudioCelebration(true);
+    setTimeout(() => {
+      setShowStudioCelebration(false);
+      initializeCreativeStudio();
+    }, 3000);
   };
 
   const handleGameComplete = async (finalScore: number) => {
@@ -692,6 +941,242 @@ const Children = () => {
                       <p className="text-sm text-amber-800 mt-1">Drag and drop beads or click to select and place</p>
                     </div>
                   </div>
+                                 ) : activeGame.id === '2' ? (
+                   // Madhubani Art Guessing Game
+                   <div className="h-full flex flex-col">
+                     <div className="text-center mb-4">
+                       <h3 className="text-lg font-semibold text-amber-900 mb-2">Madhubani Art Detective</h3>
+                       <p className="text-sm text-amber-800">Guess the type of Madhubani art form</p>
+                     </div>
+                     
+                     {!showMadhubaniResult ? (
+                       <div className="space-y-4">
+                         <div className="bg-white/80 rounded-lg p-4">
+                           <h4 className="text-lg font-semibold text-amber-900 mb-3">
+                             Question {currentMadhubaniQuestion + 1} of {madhubaniQuestions.length}
+                           </h4>
+                           
+                           {/* Art Image */}
+                           <div className="text-center mb-4">
+                             <div className="text-6xl mb-2">{madhubaniQuestions[currentMadhubaniQuestion].image}</div>
+                             <p className="text-amber-800 mb-4">{madhubaniQuestions[currentMadhubaniQuestion].question}</p>
+                           </div>
+                           
+                           {/* Answer Options */}
+                           <div className="grid grid-cols-2 gap-2">
+                             {madhubaniQuestions[currentMadhubaniQuestion].options.map((option, index) => (
+                               <Button
+                                 key={index}
+                                 onClick={() => handleMadhubaniAnswer(option)}
+                                 className="text-sm p-2 h-auto"
+                                 variant="outline"
+                               >
+                                 {option}
+                               </Button>
+                             ))}
+                           </div>
+                         </div>
+                       </div>
+                                           ) : (
+                        <div className="text-center">
+                          <div className="text-4xl mb-4">
+                            {madhubaniQuestions[currentMadhubaniQuestion].options.includes(madhubaniQuestions[currentMadhubaniQuestion].correct) ? '✅' : '❌'}
+                          </div>
+                          <h4 className="text-lg font-semibold text-amber-900 mb-2">
+                            {madhubaniQuestions[currentMadhubaniQuestion].options.includes(madhubaniQuestions[currentMadhubaniQuestion].correct) ? 'Correct!' : 'Wrong Answer!'}
+                          </h4>
+                          <p className="text-amber-800 mb-4">
+                            {madhubaniQuestions[currentMadhubaniQuestion].options.includes(madhubaniQuestions[currentMadhubaniQuestion].correct) 
+                              ? madhubaniQuestions[currentMadhubaniQuestion].fact 
+                              : `The correct answer is: ${madhubaniQuestions[currentMadhubaniQuestion].correct}`
+                            }
+                          </p>
+                          {!madhubaniQuestions[currentMadhubaniQuestion].options.includes(madhubaniQuestions[currentMadhubaniQuestion].correct) && (
+                            <p className="text-amber-700 text-sm mb-4">{madhubaniQuestions[currentMadhubaniQuestion].fact}</p>
+                          )}
+                        </div>
+                      )}
+                   </div>
+                                 ) : activeGame.id === '3' ? (
+                   // Pithora Bead Pattern Game (same as Warli)
+                   <div className="h-full flex flex-col">
+                     <div className="text-center mb-4">
+                       <h3 className="text-lg font-semibold text-amber-900 mb-2">Pithora Bead Pattern Match</h3>
+                       <p className="text-sm text-amber-800">Arrange the beads to match the target pattern</p>
+                     </div>
+                     
+                     {/* Target Pattern */}
+                     <div className="mb-4">
+                       <p className="text-sm font-medium text-amber-900 mb-2">Target Pattern:</p>
+                       <div className="flex gap-2 justify-center">
+                         {targetPithoraPattern.map((color, index) => (
+                           <div
+                             key={index}
+                             className="w-8 h-8 rounded-full border-2 border-amber-800 shadow-md"
+                             style={{ backgroundColor: color }}
+                           />
+                         ))}
+                       </div>
+                     </div>
+                     
+                     {/* Your Pattern */}
+                     <div className="mb-4">
+                       <p className="text-sm font-medium text-amber-900 mb-2">Your Pattern:</p>
+                       <div className="flex gap-2 justify-center">
+                         {pithoraBeads.map((color, index) => (
+                           <div
+                             key={index}
+                             className="w-8 h-8 rounded-full border-2 border-amber-800 shadow-md cursor-pointer hover:scale-110 transition-transform"
+                             style={{ backgroundColor: color }}
+                             draggable
+                             onDragStart={() => setDraggedPithoraBead(color)}
+                             onDragOver={(e) => e.preventDefault()}
+                             onDrop={() => handlePithoraBeadDrop(index, draggedPithoraBead || '')}
+                             onClick={() => {
+                               // Simple click-to-swap for mobile/accessibility
+                               if (draggedPithoraBead) {
+                                 handlePithoraBeadDrop(index, draggedPithoraBead);
+                               } else {
+                                 setDraggedPithoraBead(color);
+                               }
+                             }}
+                           />
+                         ))}
+                       </div>
+                     </div>
+                     
+                     <div className="text-center">
+                       <p className="text-lg font-semibold text-amber-900">Score: {gameScore}</p>
+                       <p className="text-sm text-amber-800 mt-1">Drag and drop beads or click to select and place</p>
+                     </div>
+                   </div>
+                ) : activeGame.id === '4' ? (
+                  // Folk Art Quiz Master
+                  <div className="h-full flex flex-col">
+                    <div className="text-center mb-4">
+                      <h3 className="text-lg font-semibold text-amber-900 mb-2">Folk Art Quiz Master</h3>
+                      <p className="text-sm text-amber-800">Test your knowledge about Indian folk art</p>
+                    </div>
+                    
+                    {!showQuizResult ? (
+                      <div className="space-y-4">
+                        <div className="bg-white/80 rounded-lg p-4">
+                          <h4 className="text-lg font-semibold text-amber-900 mb-3">
+                            Question {currentQuestion + 1} of {quizQuestions.length}
+                          </h4>
+                          <p className="text-amber-800 mb-4">{quizQuestions[currentQuestion].question}</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {quizQuestions[currentQuestion].options.map((option, index) => (
+                              <Button
+                                key={index}
+                                onClick={() => handleQuizAnswer(option)}
+                                className="text-sm p-2 h-auto"
+                                variant="outline"
+                              >
+                                {option}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <div className="text-4xl mb-4">🎯</div>
+                        <h4 className="text-lg font-semibold text-amber-900 mb-2">Quiz Complete!</h4>
+                        <p className="text-amber-800 mb-4">Your Score: {quizScore} points</p>
+                        <Button
+                          onClick={() => {
+                            setShowQuizResult(false);
+                            setCurrentQuestion(0);
+                            setQuizScore(0);
+                            setQuizAnswers([]);
+                          }}
+                          className="bg-amber-600 hover:bg-amber-700"
+                        >
+                          Play Again
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ) : activeGame.id === '5' ? (
+                  // Art Form Memory Game
+                  <div className="h-full flex flex-col">
+                    <div className="text-center mb-4">
+                      <h3 className="text-lg font-semibold text-amber-900 mb-2">Art Form Memory Game</h3>
+                      <p className="text-sm text-amber-800">Find matching pairs of art form symbols</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-4 gap-2 justify-center">
+                      {memoryCards.map((card, index) => (
+                        <div
+                          key={index}
+                          className={`w-12 h-12 rounded border-2 cursor-pointer hover:scale-110 transition-transform flex items-center justify-center text-2xl ${
+                            flippedCards.includes(index) || matchedPairs.includes(index)
+                              ? 'bg-amber-200 border-amber-800'
+                              : 'bg-amber-100 border-amber-600'
+                          }`}
+                          onClick={() => handleMemoryCardClick(index)}
+                        >
+                          {(flippedCards.includes(index) || matchedPairs.includes(index)) ? card : '❓'}
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="text-center mt-4">
+                      <p className="text-sm text-amber-800">Matched Pairs: {matchedPairs.length / 2}</p>
+                    </div>
+                  </div>
+                ) : activeGame.id === '6' ? (
+                  // Creative Art Studio
+                  <div className="h-full flex flex-col">
+                    <div className="text-center mb-4">
+                      <h3 className="text-lg font-semibold text-amber-900 mb-2">Creative Art Studio</h3>
+                      <p className="text-sm text-amber-800">Create your own folk art masterpiece</p>
+                    </div>
+                    
+                    {/* Color Palette */}
+                    <div className="mb-4">
+                      <p className="text-sm font-medium text-amber-900 mb-2">Select Color:</p>
+                      <div className="flex gap-2 justify-center flex-wrap">
+                        {['#8B4513', '#D2691E', '#CD853F', '#F4A460', '#DEB887', '#F5DEB3', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'].map((color, index) => (
+                          <div
+                            key={index}
+                            className={`w-6 h-6 rounded-full border-2 cursor-pointer hover:scale-110 transition-transform ${
+                              selectedColorStudio === color ? 'border-amber-800' : 'border-gray-300'
+                            }`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => setSelectedColorStudio(color)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Drawing Canvas */}
+                    <div className="mb-4">
+                      <p className="text-sm font-medium text-amber-900 mb-2">Your Canvas:</p>
+                      <div className="grid grid-cols-8 gap-1 justify-center">
+                        {drawingCanvas.map((row, rowIndex) =>
+                          row.map((cell, colIndex) => (
+                            <div
+                              key={`${rowIndex}-${colIndex}`}
+                              className="w-6 h-6 rounded border border-amber-800 cursor-pointer hover:scale-110 transition-transform"
+                              style={{ backgroundColor: cell }}
+                              onClick={() => handleCanvasClick(rowIndex, colIndex)}
+                            />
+                          ))
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="text-center">
+                      <Button
+                        onClick={handleSaveArtwork}
+                        className="bg-amber-600 hover:bg-amber-700"
+                      >
+                        Save Artwork
+                      </Button>
+                    </div>
+                  </div>
                 ) : (
                   // Default game interface for other games
                   <div className="text-center h-full flex flex-col justify-center">
@@ -801,6 +1286,178 @@ const Children = () => {
                >
                  OK, Let's Play!
                </Button>
+             </CardContent>
+           </Card>
+         </div>
+       )}
+
+               {/* Madhubani Celebration Modal */}
+        {showMadhubaniCelebration && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md bg-gradient-to-br from-amber-50 to-orange-100 border-2 border-amber-300">
+              <CardContent className="p-8 text-center">
+                <div className="mb-6">
+                  <div className="text-6xl mb-4">🎭</div>
+                  <h3 className="text-2xl font-bold text-amber-900 mb-2">Excellent!</h3>
+                  <p className="text-lg text-amber-800 mb-4">Madhubani Quiz Complete!</p>
+                  <div className="text-3xl font-bold text-amber-700 mb-4">+{madhubaniScore} Points</div>
+                </div>
+                
+                <div className="bg-white/80 rounded-lg p-4 mb-6">
+                  <div className="text-2xl mb-3">🎨</div>
+                  <h4 className="text-lg font-semibold text-amber-900 mb-2">Madhubani Art Fact!</h4>
+                  <p className="text-sm text-amber-800 leading-relaxed">
+                    Madhubani art is known for its bright colors and intricate patterns, traditionally painted by women on walls and floors during festivals!
+                  </p>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => {
+                      setShowMadhubaniCelebration(false);
+                      initializeMadhubaniGame();
+                    }}
+                    className="flex-1 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+                  >
+                    Play Again
+                  </Button>
+                  <Button
+                    onClick={() => setShowMadhubaniCelebration(false)}
+                    variant="outline"
+                    className="border-amber-300 text-amber-700 hover:bg-amber-100"
+                  >
+                    Continue Playing
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+                                                               {/* Pithora Celebration Modal */}
+          {showPithoraCelebration && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <Card className="w-full max-w-md bg-gradient-to-br from-amber-50 to-orange-100 border-2 border-amber-300">
+                <CardContent className="p-8 text-center">
+                  <div className="mb-6">
+                    <div className="text-6xl mb-4">🎉</div>
+                    <h3 className="text-2xl font-bold text-amber-900 mb-2">Excellent!</h3>
+                    <p className="text-lg text-amber-800 mb-4">Pattern Matched!</p>
+                    <div className="text-3xl font-bold text-amber-700 mb-4">+150 Points</div>
+                  </div>
+                  
+                  <div className="bg-white/80 rounded-lg p-4 mb-6">
+                    <div className="text-2xl mb-3">🏛️</div>
+                    <h4 className="text-lg font-semibold text-amber-900 mb-2">Pithora Art Fact!</h4>
+                    <p className="text-sm text-amber-800 leading-relaxed">
+                      Pithora art is a sacred tribal art form used in religious ceremonies and rituals, telling stories of gods and tribal mythology!
+                    </p>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => {
+                        setShowPithoraCelebration(false);
+                        initializePithoraGame();
+                      }}
+                      className="flex-1 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+                    >
+                      Next Pattern
+                    </Button>
+                    <Button
+                      onClick={() => setShowPithoraCelebration(false)}
+                      variant="outline"
+                      className="border-amber-300 text-amber-700 hover:bg-amber-100"
+                    >
+                      Continue Playing
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+       {/* Memory Game Celebration Modal */}
+       {showMemoryCelebration && (
+         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+           <Card className="w-full max-w-md bg-gradient-to-br from-amber-50 to-orange-100 border-2 border-amber-300">
+             <CardContent className="p-8 text-center">
+               <div className="mb-6">
+                 <div className="text-6xl mb-4">🧠</div>
+                 <h3 className="text-2xl font-bold text-amber-900 mb-2">Fantastic!</h3>
+                 <p className="text-lg text-amber-800 mb-4">All Pairs Matched!</p>
+                 <div className="text-3xl font-bold text-amber-700 mb-4">+{matchedPairs.length * 10} Points</div>
+               </div>
+               
+               <div className="bg-white/80 rounded-lg p-4 mb-6">
+                 <div className="text-2xl mb-3">🎨</div>
+                 <h4 className="text-lg font-semibold text-amber-900 mb-2">Memory Game Fact!</h4>
+                 <p className="text-sm text-amber-800 leading-relaxed">
+                   Memory games help improve concentration and pattern recognition - skills that are important for understanding art forms!
+                 </p>
+               </div>
+               
+               <div className="flex gap-2">
+                 <Button
+                   onClick={() => {
+                     setShowMemoryCelebration(false);
+                     initializeMemoryGame();
+                   }}
+                   className="flex-1 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+                 >
+                   Play Again
+                 </Button>
+                 <Button
+                   onClick={() => setShowMemoryCelebration(false)}
+                   variant="outline"
+                   className="border-amber-300 text-amber-700 hover:bg-amber-100"
+                 >
+                   Continue Playing
+                 </Button>
+               </div>
+             </CardContent>
+           </Card>
+         </div>
+       )}
+
+       {/* Creative Studio Celebration Modal */}
+       {showStudioCelebration && (
+         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+           <Card className="w-full max-w-md bg-gradient-to-br from-amber-50 to-orange-100 border-2 border-amber-300">
+             <CardContent className="p-8 text-center">
+               <div className="mb-6">
+                 <div className="text-6xl mb-4">🎨</div>
+                 <h3 className="text-2xl font-bold text-amber-900 mb-2">Masterpiece!</h3>
+                 <p className="text-lg text-amber-800 mb-4">Artwork Saved!</p>
+                 <div className="text-3xl font-bold text-amber-700 mb-4">+200 Points</div>
+               </div>
+               
+               <div className="bg-white/80 rounded-lg p-4 mb-6">
+                 <div className="text-2xl mb-3">🌟</div>
+                 <h4 className="text-lg font-semibold text-amber-900 mb-2">Creative Fact!</h4>
+                 <p className="text-sm text-amber-800 leading-relaxed">
+                   Creating art helps develop creativity and self-expression. Every artist has their own unique style, just like you!
+                 </p>
+               </div>
+               
+               <div className="flex gap-2">
+                 <Button
+                   onClick={() => {
+                     setShowStudioCelebration(false);
+                     initializeCreativeStudio();
+                   }}
+                   className="flex-1 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+                 >
+                   Create New Art
+                 </Button>
+                 <Button
+                   onClick={() => setShowStudioCelebration(false)}
+                   variant="outline"
+                   className="border-amber-300 text-amber-700 hover:bg-amber-100"
+                 >
+                   Continue Playing
+                 </Button>
+               </div>
              </CardContent>
            </Card>
          </div>
