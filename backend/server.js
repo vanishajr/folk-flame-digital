@@ -11,6 +11,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const leaderboardRoutes = require('./routes/leaderboard');
 const contentRoutes = require('./routes/content');
+const marketplaceRoutes = require('./routes/marketplace');
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/content', contentRoutes);
+app.use('/api/marketplace', marketplaceRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

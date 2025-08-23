@@ -17,6 +17,7 @@ const Navigation = () => {
   const [authView, setAuthView] = useState<"login" | "signup" | "profile">("login");
   const { currentUser, userProfile } = useAuth();
   const { performSearch } = useSearch();
+
   const [showAuthModal, setShowAuthModal] = useState(false);
 
 
@@ -24,6 +25,7 @@ const Navigation = () => {
     { name: "Explore", href: "/", isLink: false },
     { name: "Learn", href: "/children", isLink: true },
     { name: "Marketplace", href: "#store", isLink: false },
+
   ];
 
   return (
@@ -103,7 +105,9 @@ const Navigation = () => {
               <ShoppingBag className="h-4 w-4" />
             </Button>
 
+
             {/* User Authentication */}
+
             {currentUser ? (
               <Button
                 size="sm"
@@ -138,7 +142,9 @@ const Navigation = () => {
                 className="flex items-center space-x-2"
               >
                 <LogIn className="h-4 w-4" />
+
                 <span className="hidden lg:inline">Sign In</span>
+
               </Button>
             )}
 
