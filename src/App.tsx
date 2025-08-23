@@ -15,7 +15,6 @@ import Marketplace from "./pages/Marketplace";
 import YourArtworks from "./pages/YourArtworks";
 import { Toaster as HotToaster } from "react-hot-toast";
 
-import Index from "./pages/Index";
 import ARViewer from "./pages/ARViewer";
 import AllCollections from "./pages/AllCollections";
 import CollectionDetail from "./pages/CollectionDetail";
