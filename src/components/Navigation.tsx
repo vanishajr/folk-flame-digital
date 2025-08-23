@@ -39,7 +39,7 @@ const Navigation = () => {
   const navItems = [
     { name: "Explore", href: "/", isLink: false },
     { name: "Learn", href: "/children", isLink: true },
-    { name: "Marketplace", href: "#store", isLink: false },
+    { name: "Marketplace", href: "/marketplace", isLink: false },
 
   ];
 
