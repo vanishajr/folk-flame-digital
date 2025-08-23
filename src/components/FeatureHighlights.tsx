@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -12,8 +13,13 @@ import {
   ArrowRight,
   Sparkles
 } from "lucide-react";
+import { useSearch } from "@/contexts/SearchContext";
+import VoiceSearchModal from "@/components/VoiceSearchModal";
 
 const FeatureHighlights = () => {
+  const [isVoiceSearchOpen, setIsVoiceSearchOpen] = useState(false);
+  const { performCulturalSearch } = useSearch();
+  
   const features = [
     {
       icon: <Mic className="h-8 w-8" />,
@@ -132,7 +138,10 @@ const FeatureHighlights = () => {
                 "Hey Heritage, show me Warli paintings from Maharashtra" - 
                 Experience hands-free exploration of our cultural treasures.
               </p>
-              <Button className="bg-heritage-gold text-heritage-brown hover:bg-heritage-gold/90 font-semibold">
+              <Button 
+                className="bg-heritage-gold text-heritage-brown hover:bg-heritage-gold/90 font-semibold"
+                onClick={() => setIsVoiceSearchOpen(true)}
+              >
                 <Mic className="mr-2 h-4 w-4" />
                 Try Voice Search
               </Button>
@@ -160,6 +169,14 @@ const FeatureHighlights = () => {
           </Card>
         </div>
       </div>
+
+      {/* Voice Search Modal for Cultural Discovery */}
+      <VoiceSearchModal
+        isOpen={isVoiceSearchOpen}
+        onClose={() => setIsVoiceSearchOpen(false)}
+        onSearch={performCulturalSearch}
+        isCulturalSearch={true}
+      />
     </section>
   );
 };
