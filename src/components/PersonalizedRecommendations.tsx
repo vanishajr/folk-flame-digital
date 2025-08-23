@@ -1,38 +1,25 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Sparkles, 
-  Palette, 
-  Heart, 
-  Search, 
-  Loader2,
-  ArrowRight,
-  Star,
-  Eye,
-  Bot,
-  X
-} from "lucide-react";
-import { Link } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Bot, X, ArrowRight, Sparkles, Palette, Heart, Star } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ArtworkRecommendation {
-  id: string;
   title: string;
+  artist: string;
   artform: string;
   description: string;
+  price: string;
   image: string;
-  similarity: number;
-  artist: string;
-  location: string;
+  rating: number;
   tags: string[];
-  reasoning: string;
 }
 
 const PersonalizedRecommendations = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const { t } = useLanguage();
   const [step, setStep] = useState(1);
   const [preferences, setPreferences] = useState({
     favoriteArtforms: [] as string[],
@@ -43,101 +30,55 @@ const PersonalizedRecommendations = () => {
   });
   const [recommendations, setRecommendations] = useState<ArtworkRecommendation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [userInput, setUserInput] = useState("");
-  const [aiResponse, setAiResponse] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const artformOptions = [
+    "Warli", "Madhubani", "Pithora", "Gond", "Kalighat", "Phad", "Cheriyal", "Pattachitra"
+  ];
+
+  const colorOptions = [
+    "Red", "Blue", "Green", "Yellow", "Orange", "Purple", "Pink", "Brown", "Black", "White"
+  ];
+
+  const themeOptions = [
+    "Nature", "Mythology", "Daily Life", "Spiritual", "Festivals", "Animals", "Landscapes", "Abstract"
+  ];
+
+  const budgetOptions = [
+    "Under ₹1,000", "₹1,000 - ₹5,000", "₹5,000 - ₹10,000", "₹10,000 - ₹25,000", "Above ₹25,000"
+  ];
 
   const GEMINI_API_KEY = "AIzaSyDd3NTJd5NgazyXwCnZL9FJvruQvIkVf5E";
   const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
 
-  const artformOptions = [
-    "Madhubani", "Warli", "Gond Art", "Bhil Art", "Pattachitra", 
-    "Tanjore Painting", "Kalamkari", "Cheriyal Scrolls", "Pithora", "Kalighat"
-  ];
-
-  const colorOptions = [
-    "Vibrant & Bold", "Earth Tones", "Pastels", "Monochrome", 
-    "Traditional Colors", "Modern Colors", "Natural Dyes"
-  ];
-
-  const themeOptions = [
-    "Nature & Landscapes", "Mythology & Religion", "Daily Life", "Tribal Culture",
-    "Abstract & Geometric", "Animals & Birds", "Festivals & Celebrations",
-    "Spiritual & Meditation", "Contemporary Issues", "Traditional Stories"
-  ];
-
-  const budgetOptions = [
-    "Under ₹1,000", "₹1,000 - ₹5,000", "₹5,000 - ₹10,000", 
-    "₹10,000 - ₹25,000", "Above ₹25,000", "No specific budget"
-  ];
-
-  const handlePreferenceChange = (category: string, value: string) => {
-    setPreferences(prev => {
-      const currentValues = prev[category as keyof typeof prev] as string[];
-      if (currentValues.includes(value)) {
-        return {
-          ...prev,
-          [category]: currentValues.filter(v => v !== value)
-        };
-      } else {
-        return {
-          ...prev,
-          [category]: [...currentValues, value]
-        };
-      }
-    });
-  };
-
-  const resetForm = () => {
-    setPreferences({
-      favoriteArtforms: [],
-      favoriteColors: [],
-      favoriteThemes: [],
-      budget: "",
-      additionalNotes: ""
-    });
-    setStep(1);
-    setRecommendations([]);
-    setAiResponse("");
-  };
-
   const generateRecommendations = async () => {
     setIsLoading(true);
-    
-    try {
-      // Create the prompt for Gemini AI
-      const prompt = `You are an expert art curator specializing in Indian folk art. Based on the following user preferences, recommend 6 specific Indian folk artworks that would be perfect for them.
+    const prompt = `You are an expert art curator specializing in Indian folk art. Based on the following user preferences, recommend 6 specific Indian folk artworks:
 
 User Preferences:
 - Favorite Art Forms: ${preferences.favoriteArtforms.join(', ')}
 - Favorite Colors: ${preferences.favoriteColors.join(', ')}
 - Favorite Themes: ${preferences.favoriteThemes.join(', ')}
-- Budget Range: ${preferences.budget}
+- Budget: ${preferences.budget}
 - Additional Notes: ${preferences.additionalNotes}
 
 Please provide recommendations in the following JSON format:
 [
   {
     "title": "Artwork Title",
-    "artform": "Specific Art Form",
-    "description": "Detailed description of the artwork and why it matches the user's preferences",
     "artist": "Artist Name",
-    "location": "Region/State",
-    "tags": ["tag1", "tag2", "tag3"],
-    "reasoning": "Explain why this artwork is perfect for the user based on their preferences",
-    "similarity": 85
+    "artform": "Art Form",
+    "description": "Brief description of the artwork",
+    "price": "Price range",
+    "image": "emoji representation",
+    "rating": 4.5,
+    "tags": ["tag1", "tag2", "tag3"]
   }
 ]
 
-Focus on:
-1. How the artwork matches their color preferences
-2. How it aligns with their budget
-3. Cultural significance and authenticity
-4. Practical placement suggestions
-5. Why it matches their chosen themes and art forms
+Focus on authentic Indian folk art that matches their preferences. Make the recommendations diverse and interesting.`;
 
-Make the recommendations highly personalized and specific to their preferences.`;
-
-      // Call Gemini AI API
+    try {
       const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
         method: 'POST',
         headers: {
@@ -152,41 +93,27 @@ Make the recommendations highly personalized and specific to their preferences.`
         })
       });
 
-      if (!response.ok) {
-        throw new Error(`API call failed: ${response.status}`);
-      }
-
       const data = await response.json();
       const aiText = data.candidates[0].content.parts[0].text;
-      setAiResponse(aiText);
-
-      // Try to parse AI response as JSON, fallback to mock data if parsing fails
+      
       try {
-        const jsonStart = aiText.indexOf('[');
-        const jsonEnd = aiText.lastIndexOf(']') + 1;
-        const jsonString = aiText.substring(jsonStart, jsonEnd);
-        const aiRecommendations = JSON.parse(jsonString);
-        
-        // Add images to AI recommendations
-        const recommendationsWithImages = aiRecommendations.map((rec: any, index: number) => ({
-          ...rec,
-          id: `ai-rec-${index}`,
-          image: `https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&crop=center&ix=1${index}`,
-          similarity: rec.similarity || Math.floor(Math.random() * 20) + 80
-        }));
-        
-        setRecommendations(recommendationsWithImages);
+        // Try to extract JSON from the response
+        const jsonMatch = aiText.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          const parsedRecommendations = JSON.parse(jsonMatch[0]);
+          setRecommendations(parsedRecommendations);
+        } else {
+          // Fallback to mock data if parsing fails
+          setRecommendations(mockRecommendations);
+        }
       } catch (parseError) {
-        console.log('Failed to parse AI response, using mock data');
-        const mockRecommendations = generateMockRecommendations();
+        console.log('AI response parsing failed, using mock data');
         setRecommendations(mockRecommendations);
       }
-
+      
       setStep(3);
     } catch (error) {
-      console.error('Error calling Gemini AI:', error);
-      // Fallback to mock recommendations
-      const mockRecommendations = generateMockRecommendations();
+      console.error('Error generating recommendations:', error);
       setRecommendations(mockRecommendations);
       setStep(3);
     } finally {
@@ -194,117 +121,118 @@ Make the recommendations highly personalized and specific to their preferences.`
     }
   };
 
-  const generateMockRecommendations = (): ArtworkRecommendation[] => {
-    const baseRecommendations = [
-      {
-        id: "rec1",
-        title: "Sacred Tree of Life",
-        artform: "Madhubani",
-        description: "A vibrant Madhubani painting featuring the sacred tree with intricate patterns and mythological elements, perfect for spiritual spaces.",
-        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-        similarity: 95,
-        artist: "Traditional Artist",
-        location: "Bihar",
-        tags: ["Sacred", "Tree", "Mythology", "Vibrant"],
-        reasoning: "Perfect match for spiritual themes and vibrant color preferences"
-      },
-      {
-        id: "rec2",
-        title: "Warli Village Scene",
-        artform: "Warli",
-        description: "Minimalist Warli art depicting daily village life with geometric patterns, ideal for modern minimalist interiors.",
-        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-        similarity: 88,
-        artist: "Warli Master",
-        location: "Maharashtra",
-        tags: ["Village", "Daily Life", "Geometric", "Minimalist"],
-        reasoning: "Ideal for modern minimalist room styles with geometric patterns"
-      },
-      {
-        id: "rec3",
-        title: "Gond Nature Symphony",
-        artform: "Gond Art",
-        description: "Contemporary Gond art featuring animals and nature in bold colors, perfect for nature lovers and eco-friendly spaces.",
-        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-        similarity: 92,
-        artist: "Gond Artist",
-        location: "Madhya Pradesh",
-        tags: ["Nature", "Animals", "Bold Colors", "Contemporary"],
-        reasoning: "Excellent choice for nature themes and bold color preferences"
-      },
-      {
-        id: "rec4",
-        title: "Bhil Tribal Celebration",
-        artform: "Bhil Art",
-        description: "Traditional Bhil dot painting showing tribal celebrations and rituals, great for cultural and traditional spaces.",
-        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-        similarity: 85,
-        artist: "Bhil Master",
-        location: "Madhya Pradesh",
-        tags: ["Tribal", "Celebration", "Rituals", "Traditional"],
-        reasoning: "Perfect for traditional Indian room styles and cultural themes"
-      },
-      {
-        id: "rec5",
-        title: "Pattachitra Mythological Tale",
-        artform: "Pattachitra",
-        description: "Intricate scroll painting telling mythological stories with rich details, perfect for traditional Indian homes.",
-        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-        similarity: 90,
-        artist: "Pattachitra Master",
-        location: "Odisha",
-        tags: ["Mythology", "Stories", "Intricate", "Traditional"],
-        reasoning: "Ideal for mythology themes and traditional room styles"
-      },
-      {
-        id: "rec6",
-        title: "Kalighat Social Commentary",
-        artform: "Kalighat",
-        description: "Modern Kalighat painting with social themes and contemporary commentary, ideal for progressive art collectors.",
-        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-        similarity: 87,
-        artist: "Kalighat Artist",
-        location: "West Bengal",
-        tags: ["Social", "Contemporary", "Commentary", "Modern"],
-        reasoning: "Perfect for contemporary themes and modern room styles"
-      }
-    ];
-
-    // Filter and customize based on user preferences
-    return baseRecommendations.map(rec => ({
-      ...rec,
-      similarity: Math.floor(Math.random() * 20) + 80, // Random similarity between 80-100
-      tags: rec.tags.slice(0, Math.floor(Math.random() * 3) + 2) // Random number of tags
-    }));
+  const resetForm = () => {
+    setPreferences({
+      favoriteArtforms: [],
+      favoriteColors: [],
+      favoriteThemes: [],
+      budget: "",
+      additionalNotes: ""
+    });
+    setStep(1);
+    setRecommendations([]);
   };
 
+  const mockRecommendations: ArtworkRecommendation[] = [
+    {
+      title: "Warli Village Scene",
+      artist: "Jivya Soma Mashe",
+      artform: "Warli",
+      description: "Traditional Warli painting depicting daily village life with geometric patterns",
+      price: "₹3,500 - ₹5,000",
+      image: "🏘️",
+      rating: 4.8,
+      tags: ["Traditional", "Village Life", "Geometric"]
+    },
+    {
+      title: "Madhubani Goddess",
+      artist: "Sita Devi",
+      artform: "Madhubani",
+      description: "Vibrant Madhubani painting of Goddess Lakshmi with intricate floral motifs",
+      price: "₹4,200 - ₹6,500",
+      image: "🌸",
+      rating: 4.9,
+      tags: ["Mythological", "Vibrant", "Floral"]
+    },
+    {
+      title: "Gond Tree of Life",
+      artist: "Jangarh Singh Shyam",
+      artform: "Gond",
+      description: "Contemporary Gond art showing the sacred tree with animals and nature",
+      price: "₹5,500 - ₹8,000",
+      image: "🌳",
+      rating: 4.7,
+      tags: ["Nature", "Contemporary", "Sacred"]
+    },
+    {
+      title: "Pithora Horse",
+      artist: "Local Artist",
+      artform: "Pithora",
+      description: "Ritualistic Pithora painting of the sacred horse with spiritual symbols",
+      price: "₹2,800 - ₹4,200",
+      image: "🐎",
+      rating: 4.6,
+      tags: ["Ritual", "Spiritual", "Traditional"]
+    },
+    {
+      title: "Kalighat Social Scene",
+      artist: "Kalam Patua",
+      artform: "Kalighat",
+      description: "Modern Kalighat painting with social commentary and contemporary themes",
+      price: "₹3,200 - ₹4,800",
+      image: "👥",
+      rating: 4.5,
+      tags: ["Social", "Modern", "Commentary"]
+    },
+    {
+      title: "Phad Scroll",
+      artist: "Traditional Phad Artist",
+      artform: "Phad",
+      description: "Ancient Phad scroll painting telling stories of local heroes and legends",
+      price: "₹6,500 - ₹9,000",
+      image: "📜",
+      rating: 4.8,
+      tags: ["Ancient", "Storytelling", "Legendary"]
+    }
+  ];
+
   const renderStep1 = () => (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-primary mb-2">What art forms do you love?</h2>
-        <p className="text-muted-foreground">Select your favorite Indian folk art forms</p>
+        <h2 className="text-2xl font-bold text-primary mb-2">{t('recommendations.step1.title')}</h2>
+        <p className="text-muted-foreground">{t('recommendations.step1.subtitle')}</p>
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {artformOptions.map((artform) => (
-          <Button
-            key={artform}
-            variant={preferences.favoriteArtforms.includes(artform) ? "default" : "outline"}
-            onClick={() => handlePreferenceChange('favoriteArtforms', artform)}
-            className="h-auto p-3 text-sm"
-          >
-            {artform}
-          </Button>
-        ))}
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2">Select your favorite art forms:</label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            {artformOptions.map((artform) => (
+              <Button
+                key={artform}
+                type="button"
+                variant={preferences.favoriteArtforms.includes(artform) ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setPreferences(prev => ({
+                    ...prev,
+                    favoriteArtforms: prev.favoriteArtforms.includes(artform)
+                      ? prev.favoriteArtforms.filter(f => f !== artform)
+                      : [...prev.favoriteArtforms, artform]
+                  }));
+                }}
+                className="justify-start"
+              >
+                {artform}
+              </Button>
+            ))}
+          </div>
+        </div>
       </div>
-
-      <div className="text-center">
-        <Button 
-          onClick={() => setStep(2)}
-          disabled={preferences.favoriteArtforms.length === 0}
-          className="px-8"
-        >
-          Continue
+      
+      <div className="flex justify-end">
+        <Button onClick={() => setStep(2)} disabled={preferences.favoriteArtforms.length === 0}>
+          {t('recommendations.continue')}
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
@@ -312,220 +240,194 @@ Make the recommendations highly personalized and specific to their preferences.`
   );
 
   const renderStep2 = () => (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-primary mb-2">Tell us more about your preferences</h2>
-        <p className="text-muted-foreground">Help us understand your style better</p>
+        <h2 className="text-2xl font-bold text-primary mb-2">{t('recommendations.step2.title')}</h2>
+        <p className="text-muted-foreground">{t('recommendations.step2.subtitle')}</p>
       </div>
-
-      <div className="space-y-6">
+      
+      <div className="space-y-4">
         <div>
-          <h3 className="font-semibold text-primary mb-3">Favorite Colors</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <label className="block text-sm font-medium text-foreground mb-2">Favorite colors:</label>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
             {colorOptions.map((color) => (
               <Button
                 key={color}
+                type="button"
                 variant={preferences.favoriteColors.includes(color) ? "default" : "outline"}
-                onClick={() => handlePreferenceChange('favoriteColors', color)}
-                className="h-auto p-3 text-sm"
+                size="sm"
+                onClick={() => {
+                  setPreferences(prev => ({
+                    ...prev,
+                    favoriteColors: prev.favoriteColors.includes(color)
+                      ? prev.favoriteColors.filter(c => c !== color)
+                      : [...prev.favoriteColors, color]
+                  }));
+                }}
               >
                 {color}
               </Button>
             ))}
           </div>
         </div>
-
+        
         <div>
-          <h3 className="font-semibold text-primary mb-3">Favorite Themes</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <label className="block text-sm font-medium text-foreground mb-2">Favorite themes:</label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {themeOptions.map((theme) => (
               <Button
                 key={theme}
+                type="button"
                 variant={preferences.favoriteThemes.includes(theme) ? "default" : "outline"}
-                onClick={() => handlePreferenceChange('favoriteThemes', theme)}
-                className="h-auto p-3 text-sm"
+                size="sm"
+                onClick={() => {
+                  setPreferences(prev => ({
+                    ...prev,
+                    favoriteThemes: prev.favoriteThemes.includes(theme)
+                      ? prev.favoriteThemes.filter(t => t !== theme)
+                      : [...prev.favoriteThemes, theme]
+                  }));
+                }}
               >
                 {theme}
               </Button>
             ))}
           </div>
         </div>
-
+        
         <div>
-          <h3 className="font-semibold text-primary mb-3">Budget Range</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <label className="block text-sm font-medium text-foreground mb-2">Budget range:</label>
+          <select
+            value={preferences.budget}
+            onChange={(e) => setPreferences(prev => ({ ...prev, budget: e.target.value }))}
+            className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
+          >
+            <option value="">Select budget range</option>
             {budgetOptions.map((budget) => (
-              <Button
-                key={budget}
-                variant={preferences.budget === budget ? "default" : "outline"}
-                onClick={() => setPreferences(prev => ({ ...prev, budget }))}
-                className="h-auto p-3 text-sm"
-              >
-                {budget}
-              </Button>
+              <option key={budget} value={budget}>{budget}</option>
             ))}
-          </div>
+          </select>
         </div>
-
+        
         <div>
-          <h3 className="font-semibold text-primary mb-3">Additional Notes (Optional)</h3>
+          <label className="block text-sm font-medium text-foreground mb-2">Additional notes (optional):</label>
           <Textarea
-            placeholder="Tell us about specific requirements, room dimensions, or any other preferences..."
             value={preferences.additionalNotes}
             onChange={(e) => setPreferences(prev => ({ ...prev, additionalNotes: e.target.value }))}
+            placeholder="Tell us more about your preferences, style, or any specific requirements..."
             className="min-h-[100px]"
           />
         </div>
       </div>
-
+      
       <div className="flex justify-between">
         <Button variant="outline" onClick={() => setStep(1)}>
-          Back
+          {t('recommendations.back')}
         </Button>
-        <Button 
-          onClick={generateRecommendations}
-          disabled={preferences.favoriteColors.length === 0 || preferences.favoriteThemes.length === 0}
-          className="px-8"
-        >
-          <Bot className="mr-2 h-4 w-4" />
-          Generate AI Recommendations
+        <Button onClick={generateRecommendations} disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+              Generating...
+            </>
+          ) : (
+            <>
+              {t('recommendations.generate')}
+              <Sparkles className="ml-2 h-4 w-4" />
+            </>
+          )}
         </Button>
       </div>
     </div>
   );
 
   const renderStep3 = () => (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-primary mb-2">Your Personalized Recommendations</h2>
-        <p className="text-muted-foreground">Based on your preferences, here are artworks we think you'll love</p>
-        {aiResponse && (
-          <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
-            <div className="flex items-center gap-2 mb-2">
-              <Bot className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-primary">AI Analysis</span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {aiResponse.length > 200 ? `${aiResponse.substring(0, 200)}...` : aiResponse}
-            </p>
-          </div>
-        )}
+        <h2 className="text-2xl font-bold text-primary mb-2">{t('recommendations.step3.title')}</h2>
+        <p className="text-muted-foreground">{t('recommendations.step3.subtitle')}</p>
       </div>
-
-      {isLoading ? (
-        <div className="text-center py-12">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-lg text-muted-foreground">AI is analyzing your preferences...</p>
-          <p className="text-sm text-muted-foreground">This may take a few moments</p>
-          <div className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <Bot className="h-4 w-4" />
-            Powered by Gemini AI
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recommendations.map((artwork) => (
-            <Card key={artwork.id} className="group hover:shadow-lg transition-all duration-300">
-              <div className="relative">
-                <img
-                  src={artwork.image}
-                  alt={artwork.title}
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
-                <div className="absolute top-3 right-3">
-                  <Badge className="bg-primary text-primary-foreground">
-                    <Star className="w-3 h-3 mr-1" />
-                    {artwork.similarity}% Match
-                  </Badge>
+      
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {recommendations.map((artwork, index) => (
+          <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+            <CardHeader className="pb-3">
+              <div className="text-4xl mb-2">{artwork.image}</div>
+              <CardTitle className="text-lg font-semibold text-primary group-hover:text-primary/80 transition-colors">
+                {artwork.title}
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                by {artwork.artist} • {artwork.artform}
+              </p>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+                {artwork.description}
+              </p>
+              
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-1">
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <span className="text-sm font-medium">{artwork.rating}</span>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-t-lg" />
-                <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Button size="sm" className="w-full">
-                    <Eye className="mr-2 h-4 w-4" />
-                    View Details
-                  </Button>
-                </div>
+                <span className="text-sm font-semibold text-primary">{artwork.price}</span>
               </div>
               
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-primary line-clamp-1">
-                    {artwork.title}
-                  </h3>
-                  <Badge variant="secondary" className="text-xs">
-                    {artwork.artform}
+              <div className="flex flex-wrap gap-1 mb-3">
+                {artwork.tags.map((tag, tagIndex) => (
+                  <Badge key={tagIndex} variant="secondary" className="text-xs">
+                    {tag}
                   </Badge>
-                </div>
-                
-                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                  {artwork.description}
-                </p>
-                
-                <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
-                  <span>{artwork.artist}</span>
-                  <span>{artwork.location}</span>
-                </div>
-                
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {artwork.tags.map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-
-                {artwork.reasoning && (
-                  <div className="p-3 bg-heritage-gold/10 rounded-lg border border-heritage-gold/20">
-                    <p className="text-xs text-heritage-gold font-medium mb-1">Why this matches you:</p>
-                    <p className="text-xs text-heritage-gold/80 line-clamp-2">
-                      {artwork.reasoning}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      <div className="text-center space-y-4">
+                ))}
+              </div>
+              
+              <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                <Heart className="mr-2 h-4 w-4" />
+                Add to Wishlist
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      <div className="flex justify-between items-center pt-4 border-t border-border">
         <Button variant="outline" onClick={() => setStep(2)}>
-          Adjust Preferences
+          {t('recommendations.adjust_preferences')}
         </Button>
-        <div className="text-sm text-muted-foreground">
-          <p>Want more recommendations? Try adjusting your preferences or</p>
-          <Link to="/collections" className="text-primary hover:underline">
-            explore our full collection
-          </Link>
-        </div>
+        <Button className="bg-primary hover:bg-primary/90">
+          {t('recommendations.explore_collection')}
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
 
-  // Compact view (initial state)
   if (!isExpanded) {
     return (
-      <section className="py-20 bg-gradient-to-br from-heritage-gold/5 to-heritage-maroon/5">
+      <section className="py-20 bg-gradient-to-b from-background to-muted/20">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+          <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-6">
               <Sparkles className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="font-cultural text-4xl md:text-5xl font-bold text-primary mb-4">
-              Personalized Recommendations
-            </h1>
-            <p className="font-modern text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
-              Let AI discover the perfect Indian folk artworks for your space. 
-              Tell us about your preferences and we'll recommend pieces that match your style.
+            
+            <h2 className="font-cultural text-4xl md:text-5xl font-bold text-primary mb-4">
+              {t('recommendations.title')}
+            </h2>
+            
+            <p className="font-modern text-xl text-muted-foreground mb-8 leading-relaxed">
+              {t('recommendations.subtitle')}
             </p>
+            
             <Button 
               size="lg" 
               onClick={() => setIsExpanded(true)}
-              className="bg-primary hover:bg-primary/90 px-8 py-6 text-lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-6 text-lg shadow-lg"
             >
-              <Sparkles className="mr-3 h-6 w-6" />
-              Learn More
+              {t('recommendations.learn_more')}
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
+            
             <div className="mt-4 flex items-center justify-center gap-2 text-sm text-primary">
               <Bot className="h-4 w-4" />
               Powered by Google Gemini AI
@@ -536,27 +438,18 @@ Make the recommendations highly personalized and specific to their preferences.`
     );
   }
 
-  // Expanded view (full form)
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-background rounded-lg shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-background border-b border-border p-6 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-primary">Personalized Recommendations</h1>
-            <p className="text-muted-foreground">Step {step} of 3</p>
+            <h1 className="text-2xl font-bold text-primary">{t('recommendations.title')}</h1>
+            <p className="text-muted-foreground">{t('recommendations.step')} {step} {t('common.of')} 3</p>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => {
-              setIsExpanded(false);
-              resetForm();
-            }}
-          >
+          <Button onClick={() => { setIsExpanded(false); resetForm(); }}>
             <X className="h-5 w-5" />
           </Button>
         </div>
-        
         <div className="p-6">
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}

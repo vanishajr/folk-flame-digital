@@ -1,111 +1,117 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Eye, Heart, Share2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight, Star, Users, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import heroWarliArt from "@/assets/hero-warli-art.jpg";
 import madhubaniArt from "@/assets/madhubani-art.jpg";
 import pithoraArt from "@/assets/pithora-art.jpg";
-import heroWarliArt from "@/assets/hero-warli-art.jpg";
 
 const FeaturedCollections = () => {
-  const collections = [
+  const { t } = useLanguage();
+
+  const featuredCollections = [
     {
       id: 1,
       title: "Warli Art",
-      description: "Ancient tribal art form from Maharashtra depicting daily life through geometric patterns",
+      description: "Ancient tribal art from Maharashtra, featuring simple geometric patterns and scenes from daily life",
       image: heroWarliArt,
-      items: "1,234 artworks",
-      region: "Maharashtra",
-      period: "3000+ years old"
+      category: "Tribal Art",
+      rating: 4.8,
+      followers: "2.1k",
+      lastUpdated: "2 days ago",
+      items: 45
     },
     {
       id: 2,
-      title: "Madhubani Paintings",
-      description: "Vibrant folk art from Bihar featuring nature, mythology, and social themes",
+      title: "Madhubani Painting",
+      description: "Traditional folk art from Bihar, known for its vibrant colors and intricate patterns depicting mythology and nature",
       image: madhubaniArt,
-      items: "856 artworks",
-      region: "Bihar",
-      period: "600+ years old"
+      category: "Folk Painting",
+      rating: 4.9,
+      followers: "3.2k",
+      lastUpdated: "1 week ago",
+      items: 67
     },
     {
       id: 3,
       title: "Pithora Art",
-      description: "Ritualistic wall paintings of Gujarat celebrating life and spiritual beliefs",
+      description: "Sacred art form from Gujarat, created during religious ceremonies with natural colors and spiritual motifs",
       image: pithoraArt,
-      items: "523 artworks",
-      region: "Gujarat",
-      period: "800+ years old"
+      category: "Sacred Art",
+      rating: 4.7,
+      followers: "1.8k",
+      lastUpdated: "3 days ago",
+      items: 38
     }
   ];
 
   return (
-    <section id="collections" className="py-20 bg-gradient-warm">
+    <section className="py-20 bg-gradient-to-b from-background to-muted/20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="font-cultural text-4xl md:text-5xl font-bold text-primary mb-4">
-            Featured Collections
+            {t('collections.title')}
           </h2>
-          <p className="font-modern text-lg text-muted-foreground max-w-3xl mx-auto">
-            Explore our curated collections of traditional Indian folk artforms, 
-            each telling unique stories of cultural heritage and artistic expression.
+          <p className="font-modern text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            {t('collections.subtitle')}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {collections.map((collection) => (
-            <Card 
-              key={collection.id} 
-              className="group overflow-hidden hover:shadow-cultural transition-all duration-300 bg-card border-border/50"
-            >
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {featuredCollections.map((collection) => (
+            <Card key={collection.id} className="group hover:shadow-xl transition-all duration-300 border-border/50 hover:border-primary/30 overflow-hidden">
               <div className="relative overflow-hidden">
                 <img
                   src={collection.image}
                   alt={collection.title}
                   className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-heritage-brown/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="flex space-x-2">
-                    <Button size="sm" variant="secondary" className="h-8 w-8 p-0 bg-background/80 hover:bg-background">
-                      <Heart className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="secondary" className="h-8 w-8 p-0 bg-background/80 hover:bg-background">
-                      <Share2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Button className="w-full bg-heritage-gold text-heritage-brown hover:bg-heritage-gold/90">
-                    <Eye className="mr-2 h-4 w-4" />
-                    Explore Collection
-                  </Button>
-                </div>
+                <Badge className="absolute top-4 left-4 bg-primary/90 text-primary-foreground">
+                  {collection.category}
+                </Badge>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="font-cultural text-xl font-semibold text-primary">
-                    {collection.title}
-                  </h3>
-                  <span className="text-sm font-medium text-heritage-gold bg-heritage-gold/10 px-2 py-1 rounded">
-                    {collection.region}
-                  </span>
-                </div>
-                
-                <p className="font-modern text-muted-foreground mb-4 text-sm leading-relaxed">
+              <CardHeader className="pb-4">
+                <CardTitle className="font-cultural text-2xl text-primary group-hover:text-primary/80 transition-colors">
+                  {collection.title}
+                </CardTitle>
+                <p className="text-muted-foreground leading-relaxed">
                   {collection.description}
                 </p>
-                
-                <div className="flex justify-between items-center text-sm text-muted-foreground mb-4">
-                  <span>{collection.items}</span>
-                  <span>{collection.period}</span>
+              </CardHeader>
+              
+              <CardContent className="pt-0">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <span>{collection.rating}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Users className="h-4 w-4" />
+                      <span>{collection.followers}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      <span>{collection.lastUpdated}</span>
+                    </div>
+                  </div>
                 </div>
                 
-                <Link to={`/collections/${collection.title.toLowerCase().replace(/\s+/g, '-')}`}>
-                  <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                    View Details
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    {collection.items} {t('collections.items')}
+                  </span>
+                  <Link to={`/collections/${collection.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <Button variant="outline" size="sm" className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                      {t('collections.view_details')}
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -113,8 +119,8 @@ const FeaturedCollections = () => {
 
         <div className="text-center">
           <Link to="/collections">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 font-semibold px-8">
-              View All Collections
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-6 text-lg shadow-lg">
+              {t('collections.view_all')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
