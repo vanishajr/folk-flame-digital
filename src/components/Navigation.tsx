@@ -1,10 +1,20 @@
 import { useState } from "react";
-import { Menu, X, Mic, Search, User, ShoppingBag, Map, Camera } from "lucide-react";
+import { Menu, X, Mic, Search, User, ShoppingBag, Map, Camera, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSearch } from "@/contexts/SearchContext";
+import AuthModal from "@/components/auth/AuthModal";
+import VoiceSearchModal from "@/components/VoiceSearchModal";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isVoiceSearchOpen, setIsVoiceSearchOpen] = useState(false);
+  const [authView, setAuthView] = useState<'login' | 'signup' | 'profile'>('login');
+  const { currentUser, userProfile } = useAuth();
+  const { performSearch } = useSearch();
 
   const navItems = [
     { name: "Explore", href: "#explore" },
@@ -53,7 +63,12 @@ const Navigation = () => {
                 className="pl-10 w-64 bg-muted/50 border-border focus:bg-background"
               />
             </div>
-            <Button size="sm" variant="outline" className="gap-2">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="gap-2"
+              onClick={() => setIsVoiceSearchOpen(true)}
+            >
               <Mic className="h-4 w-4" />
               Voice
             </Button>
@@ -66,9 +81,38 @@ const Navigation = () => {
             <Button size="sm" variant="outline">
               <ShoppingBag className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="outline">
-              <User className="h-4 w-4" />
-            </Button>
+            {currentUser ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setAuthView('profile');
+                  setIsAuthModalOpen(true);
+                }}
+                className="flex items-center space-x-2"
+              >
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={userProfile?.photoURL} alt={userProfile?.displayName || 'User'} />
+                  <AvatarFallback className="text-xs">
+                    {userProfile?.displayName ? userProfile.displayName.charAt(0).toUpperCase() : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="hidden sm:inline">{userProfile?.displayName || 'User'}</span>
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setAuthView('login');
+                  setIsAuthModalOpen(true);
+                }}
+                className="flex items-center space-x-2"
+              >
+                <LogIn className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign In</span>
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -107,7 +151,12 @@ const Navigation = () => {
                   />
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Button size="sm" variant="outline" className="gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="gap-2"
+                    onClick={() => setIsVoiceSearchOpen(true)}
+                  >
                     <Mic className="h-4 w-4" />
                     Voice
                   </Button>
@@ -126,6 +175,21 @@ const Navigation = () => {
           </div>
         )}
       </div>
+
+      {/* Authentication Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialView={authView}
+      />
+
+      {/* Voice Search Modal */}
+      <VoiceSearchModal
+        isOpen={isVoiceSearchOpen}
+        onClose={() => setIsVoiceSearchOpen(false)}
+        onSearch={performSearch}
+        isCulturalSearch={false}
+      />
     </nav>
   );
 };
