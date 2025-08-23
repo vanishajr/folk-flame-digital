@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Heart, Share2 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CollectionData {
   id: string;
@@ -22,8 +23,54 @@ const CollectionDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [collection, setCollection] = useState<CollectionData | null>(null);
   const [isLiked, setIsLiked] = useState(false);
+  const { t } = useLanguage();
 
   const collectionsData: Record<string, CollectionData> = {
+    "warli-art": {
+      id: "warli-art",
+      title: "Warli Art",
+      subtitle: "Ancient tribal art from Maharashtra",
+      description: "Warli painting is an ancient tribal art form practiced by the Warli tribe of Maharashtra, India. This minimalist art form is characterized by its simple geometric shapes, stick figures, and depictions of daily life. The art form uses only three basic shapes: circle, triangle, and square, creating intricate patterns that tell stories of village life, festivals, and rituals.",
+      region: "Maharashtra",
+      period: "3000+ years old",
+      category: "Tribal Art",
+      facts: [
+        "Warli art is one of the oldest art forms in India, dating back over 3000 years",
+        "The art form uses only three basic shapes: circle, triangle, and square",
+        "Traditionally painted on walls using rice paste and natural colors",
+        "Warli paintings often depict scenes from daily life, festivals, and rituals"
+      ]
+    },
+    "madhubani-painting": {
+      id: "madhubani-painting",
+      title: "Madhubani Painting",
+      subtitle: "Ancient folk art from the land of Sita",
+      description: "Madhubani painting, also known as Mithila art, is a traditional folk art form practiced in the Mithila region of Bihar, India. This art form is characterized by its intricate line drawings, vibrant colors, and depictions of Hindu deities. Traditionally painted by women on walls and floors during festivals, Madhubani art has five distinct styles: Bharni, Kachni, Tantrik, Godna, and Kohbar.",
+      region: "Bihar",
+      period: "600+ years old",
+      category: "Folk Art",
+      facts: [
+        "Madhubani art originated in the Mithila region, the birthplace of Sita from the Ramayana",
+        "Traditionally painted by women on walls and floors during festivals",
+        "The art form has five distinct styles: Bharni, Kachni, Tantrik, Godna, and Kohbar",
+        "Madhubani paintings often depict scenes from Hindu mythology"
+      ]
+    },
+    "pithora-art": {
+      id: "pithora-art",
+      title: "Pithora Art",
+      subtitle: "Sacred ritualistic art from Gujarat",
+      description: "Pithora art is a sacred ritualistic art form practiced by the Rathwa, Bhil, and Nayak tribes of Gujarat. This art form is created during religious ceremonies and is characterized by its use of natural colors, spiritual motifs, and depictions of the sacred horse. Pithora paintings are believed to bring good fortune and are often created on walls during important life events.",
+      region: "Gujarat",
+      period: "800+ years old",
+      category: "Sacred Art",
+      facts: [
+        "Pithora art is created during religious ceremonies and rituals",
+        "The sacred horse is a central motif in Pithora paintings",
+        "Traditionally painted on walls using natural colors and materials",
+        "Pithora art is believed to bring good fortune and prosperity"
+      ]
+    },
     "gond-art": {
       id: "gond-art",
       title: "Gond Art",
@@ -111,9 +158,16 @@ const CollectionDetail = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <div className="flex items-center justify-center min-h-screen">
-          <p className="text-muted-foreground">Loading...</p>
+        <div className="container mx-auto px-4 py-20">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-primary mb-4">Collection Not Found</h1>
+            <p className="text-muted-foreground mb-6">The collection you're looking for doesn't exist.</p>
+            <Link to="/collections">
+              <Button>Back to Collections</Button>
+            </Link>
+          </div>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -122,100 +176,99 @@ const CollectionDetail = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main>
-        {/* Simple Header */}
-        <section className="pt-20 pb-8 bg-gradient-to-r from-heritage-gold/10 to-heritage-maroon/10">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center gap-4 mb-4">
-              <Link to="/collections" className="flex items-center text-primary hover:text-primary/80">
-                <ArrowLeft className="h-5 w-5 mr-2" />
-                Back
-              </Link>
-              <Badge className="bg-heritage-gold/20 text-heritage-gold">
-                {collection.category}
-              </Badge>
-            </div>
-            
-            <h1 className="font-cultural text-4xl md:text-5xl font-bold text-primary mb-2">
+      {/* Hero Section */}
+      <section className="relative py-20 bg-gradient-to-b from-primary/5 to-background">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <Badge className="mb-4" variant="secondary">
+              {collection.category}
+            </Badge>
+            <h1 className="font-cultural text-4xl md:text-6xl font-bold text-primary mb-4">
               {collection.title}
             </h1>
-            
-            <p className="font-modern text-lg text-muted-foreground mb-4">
+            <p className="font-modern text-xl text-muted-foreground mb-6">
               {collection.subtitle}
             </p>
-            
-            <div className="flex items-center gap-4">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setIsLiked(!isLiked)}
-              >
-                <Heart className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-              </Button>
-              <Button size="sm" variant="ghost">
-                <Share2 className="h-4 w-4" />
-              </Button>
+            <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+              <span>📍 {collection.region}</span>
+              <span>⏰ {collection.period}</span>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Simple Image */}
-        <section className="py-8">
-          <div className="container mx-auto px-4">
-            <div className="w-full h-64 bg-gradient-to-br from-heritage-gold/20 via-heritage-maroon/20 to-heritage-brown/20 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-heritage-gold/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">🎨</span>
-                </div>
-                <p className="text-muted-foreground">{collection.title} Artwork</p>
+      {/* Main Content */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Description */}
+              <div className="md:col-span-2">
+                <Card>
+                  <CardContent className="p-6">
+                    <h2 className="text-2xl font-semibold text-primary mb-4">About {collection.title}</h2>
+                    <p className="text-muted-foreground leading-relaxed mb-6">
+                      {collection.description}
+                    </p>
+                    
+                    <h3 className="text-xl font-semibold text-primary mb-3">Quick Facts</h3>
+                    <ul className="space-y-2">
+                      {collection.facts.map((fact, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <span className="text-primary mt-1">•</span>
+                          <span className="text-muted-foreground">{fact}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
               </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Content */}
-        <section className="py-8">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Main Content */}
-              <div>
-                <h2 className="font-cultural text-2xl font-bold text-primary mb-4">
-                  About {collection.title}
-                </h2>
-                <p className="text-muted-foreground leading-relaxed mb-6">
-                  {collection.description}
-                </p>
-                
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-background border border-border rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground">Region</p>
-                    <p className="font-semibold text-primary">{collection.region}</p>
-                  </div>
-                  <div className="bg-background border border-border rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground">Period</p>
-                    <p className="font-semibold text-primary">{collection.period}</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Facts */}
-              <div>
-                <h3 className="font-cultural text-xl font-semibold text-primary mb-4">
-                  Interesting Facts
-                </h3>
-                <div className="space-y-3">
-                  {collection.facts.map((fact, index) => (
-                    <div key={index} className="flex items-start p-3 bg-background border border-border rounded-lg">
-                      <span className="w-2 h-2 bg-heritage-gold rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      <p className="text-sm text-muted-foreground">{fact}</p>
+              {/* Sidebar */}
+              <div className="space-y-6">
+                <Card>
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Collection Info</h3>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Category:</span>
+                        <span className="font-medium">{collection.category}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Region:</span>
+                        <span className="font-medium">{collection.region}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Period:</span>
+                        <span className="font-medium">{collection.period}</span>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => setIsLiked(!isLiked)}
+                      >
+                        <Heart className={`h-4 w-4 mr-2 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+                        {isLiked ? 'Liked' : 'Like'}
+                      </Button>
+                      <Button variant="outline" className="flex-1">
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
 
       <Footer />
     </div>
