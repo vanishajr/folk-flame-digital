@@ -100,10 +100,12 @@ const FeaturedCollections = () => {
                   <span>{collection.period}</span>
                 </div>
                 
-                <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                  View Details
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <Link to={`/collections/${collection.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    View Details
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           ))}

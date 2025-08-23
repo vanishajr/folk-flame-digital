@@ -396,13 +396,15 @@ const AllCollections = () => {
                       </div>
                     </div>
                     
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">{collection.items}</span>
-                      <Button variant="ghost" size="sm" className="text-xs h-8">
-                        View Details
-                        <ArrowRight className="ml-1 h-3 w-3" />
-                      </Button>
-                    </div>
+                                         <div className="flex justify-between items-center">
+                       <span className="text-xs text-muted-foreground">{collection.items}</span>
+                       <Link to={`/collections/${collection.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                         <Button variant="ghost" size="sm" className="text-xs h-8">
+                           View Details
+                           <ArrowRight className="ml-1 h-3 w-3" />
+                         </Button>
+                       </Link>
+                     </div>
                   </CardContent>
                 </Card>
               ))}

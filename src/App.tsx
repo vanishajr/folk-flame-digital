@@ -9,6 +9,7 @@ import { Toaster as HotToaster } from "react-hot-toast";
 import Index from "./pages/Index";
 import ARViewer from "./pages/ARViewer";
 import AllCollections from "./pages/AllCollections";
+import CollectionDetail from "./pages/CollectionDetail";
 import NotFound from "./pages/NotFound";
 import AuthDemo from "./pages/AuthDemo";
 
@@ -16,21 +17,6 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-<<<<<<< HEAD
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/ar-viewer" element={<ARViewer />} />
-          <Route path="/collections" element={<AllCollections />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-=======
     <AuthProvider>
       <SearchProvider>
         <TooltipProvider>
@@ -40,6 +26,9 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/ar-viewer" element={<ARViewer />} />
+              <Route path="/collections" element={<AllCollections />} />
+              <Route path="/collections/:id" element={<CollectionDetail />} />
               <Route path="/auth-demo" element={<AuthDemo />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
@@ -48,7 +37,6 @@ const App = () => (
         </TooltipProvider>
       </SearchProvider>
     </AuthProvider>
->>>>>>> 86960cf66398cf673302c46f4de1140363f900c1
   </QueryClientProvider>
 );
 
