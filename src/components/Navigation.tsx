@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { Menu, X, Mic, Search, User, ShoppingBag, Map, Camera, LogIn } from "lucide-react";
+
+import { Menu, X, Mic, Search, User, ShoppingBag, Map, Camera, LogIn, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSearch } from "@/contexts/SearchContext";
 import AuthModal from "@/components/auth/AuthModal";
 import VoiceSearchModal from "@/components/VoiceSearchModal";
+import AuthModal from "./AuthModal";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,15 +18,18 @@ const Navigation = () => {
   const [authView, setAuthView] = useState<'login' | 'signup' | 'profile'>('login');
   const { currentUser, userProfile } = useAuth();
   const { performSearch } = useSearch();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+
 
   const navItems = [
-    { name: "Explore", href: "#explore" },
-    { name: "Collections", href: "#collections" },
-    { name: "Artists", href: "#artists" },
-    { name: "Museum Tours", href: "#tours" },
-    { name: "Children", href: "#children" },
-    { name: "Store", href: "#store" },
-    { name: "AR Experience", href: "#ar" },
+    { name: "Explore", href: "/", isLink: false },
+    { name: "Collections", href: "#collections", isLink: false },
+    { name: "Artists", href: "#artists", isLink: false },
+    { name: "Museum Tours", href: "#tours", isLink: false },
+    { name: "Children", href: "/children", isLink: true },
+    { name: "Store", href: "#store", isLink: false },
+    { name: "AR Experience", href: "#ar", isLink: false },
   ];
 
   return (
@@ -32,25 +38,38 @@ const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-cultural rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">H</span>
-            </div>
-            <span className="font-cultural text-xl font-semibold text-primary">
-              Heritage Arts
-            </span>
+            <Link to="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-cultural rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-sm">H</span>
+              </div>
+              <span className="font-cultural text-xl font-semibold text-primary">
+                Heritage Arts
+              </span>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => (
-              <Button
-                key={item.name}
-                variant="ghost"
-                className="text-sm font-medium text-foreground hover:text-primary hover:bg-secondary/50"
-                asChild
-              >
-                <a href={item.href}>{item.name}</a>
-              </Button>
+              item.isLink ? (
+                <Button
+                  key={item.name}
+                  variant="ghost"
+                  className="text-sm font-medium text-foreground hover:text-primary hover:bg-secondary/50"
+                  asChild
+                >
+                  <Link to={item.href}>{item.name}</Link>
+                </Button>
+              ) : (
+                <Button
+                  key={item.name}
+                  variant="ghost"
+                  className="text-sm font-medium text-foreground hover:text-primary hover:bg-secondary/50"
+                  asChild
+                >
+                  <a href={item.href}>{item.name}</a>
+                </Button>
+              )
             ))}
           </div>
 
@@ -81,6 +100,20 @@ const Navigation = () => {
             <Button size="sm" variant="outline">
               <ShoppingBag className="h-4 w-4" />
             </Button>
+
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-amber-800">
+                  {user?.profile.displayName || user?.username}
+                </span>
+                <Button size="sm" variant="outline" onClick={logout}>
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button size="sm" variant="outline" onClick={() => setShowAuthModal(true)}>
+                <User className="h-4 w-4" />
+
             {currentUser ? (
               <Button
                 size="sm"
@@ -111,6 +144,7 @@ const Navigation = () => {
               >
                 <LogIn className="h-4 w-4" />
                 <span className="hidden sm:inline">Sign In</span>
+
               </Button>
             )}
           </div>
@@ -131,16 +165,29 @@ const Navigation = () => {
           <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col space-y-2">
               {navItems.map((item) => (
-                <Button
-                  key={item.name}
-                  variant="ghost"
-                  className="justify-start text-sm font-medium"
-                  asChild
-                >
-                  <a href={item.href} onClick={() => setIsMenuOpen(false)}>
-                    {item.name}
-                  </a>
-                </Button>
+                item.isLink ? (
+                  <Button
+                    key={item.name}
+                    variant="ghost"
+                    className="justify-start text-sm font-medium"
+                    asChild
+                  >
+                    <Link to={item.href} onClick={() => setIsMenuOpen(false)}>
+                      {item.name}
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    key={item.name}
+                    variant="ghost"
+                    className="justify-start text-sm font-medium"
+                    asChild
+                  >
+                    <a href={item.href} onClick={() => setIsMenuOpen(false)}>
+                      {item.name}
+                    </a>
+                  </Button>
+                )
               ))}
               <div className="pt-2 mt-2 border-t border-border">
                 <div className="relative mb-3">
@@ -175,6 +222,7 @@ const Navigation = () => {
           </div>
         )}
       </div>
+
 
       {/* Authentication Modal */}
       <AuthModal
