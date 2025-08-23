@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Menu, X, Mic, Search, User, ShoppingBag, Map, Camera, LogIn, Globe, ChevronDown } from "lucide-react";
+import { Menu, X, Mic, Search, User, ShoppingBag, Map, Camera, LogIn, LogOut, Globe, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,11 +25,13 @@ const Navigation = () => {
   const [isVoiceSearchOpen, setIsVoiceSearchOpen] = useState(false);
 
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
-  const [authView, setAuthView] = useState<'login' | 'signup' | 'profile'>('login');
+  const [authView, setAuthView] = useState<"login" | "signup" | "profile">("login");
+
   const { currentUser, userProfile, logout } = useAuth();
 
   const { performSearch } = useSearch();
   const { language, setLanguage, t, currentLanguage } = useLanguage();
+
 
   const languages = [
     { code: 'en', name: 'English', native: 'English' },
@@ -37,8 +39,6 @@ const Navigation = () => {
     { code: 'kn', name: 'Kannada', native: 'ಕನ್ನಡ' },
     { code: 'ml', name: 'Malayalam', native: 'മലയാളം' }
   ];
-
-  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -51,17 +51,13 @@ const Navigation = () => {
 
   const navItems = [
 
-    { name: t('nav.explore'), href: "#explore" },
-    { name: t('nav.collections'), href: "#collections" },
-    { name: t('nav.artists'), href: "#artists" },
-    { name: t('nav.museum_tours'), href: "#tours" },
-    { name: t('nav.children'), href: "#children" },
-    { name: t('nav.store'), href: "#store" },
-    { name: t('nav.ar_experience'), href: "#ar" },
-
-    { name: "Explore", href: "/", isLink: false },
-    { name: "Learn", href: "/children", isLink: true },
+    { name: t('nav.explore'), href: "#explore", isLink: false },
+    { name: t('nav.museum_tours'), href: "#tours", isLink: false },
+    { name: t('nav.children'), href: "/children", isLink: true },
     { name: "Marketplace", href: "/marketplace", isLink: false },
+    { name: t('nav.ar_experience'), href: "#ar", isLink: false },
+    { name: "Export Guide", href: "/export-compliance", isLink: true },
+    { name: "Artist Badges", href: "/artist-badging", isLink: true },
 
   ];
 
@@ -120,6 +116,7 @@ const Navigation = () => {
 
                 placeholder={t('nav.search_placeholder')}
                 className="pl-10 w-64 bg-muted/50 border-border focus:bg-background"
+
               />
             </div>
             
@@ -158,6 +155,54 @@ const Navigation = () => {
               )}
             </div>
 
+
+          {/* Right Side Icons and Actions */}
+          <div className="flex items-center space-x-2">
+            {/* Language Selector */}
+            <div className="relative">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+              >
+                <Globe className="h-4 w-4" />
+                {currentLanguage.native}
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+              
+              {isLanguageDropdownOpen && (
+                <div className="absolute top-full right-0 mt-1 w-48 bg-background border border-border rounded-lg shadow-lg z-50">
+                  <div className="py-2">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => handleLanguageChange(lang)}
+                        className={`w-full px-4 py-2 text-left text-sm hover:bg-secondary/50 transition-colors ${
+                          language === lang.code ? 'bg-secondary text-primary' : 'text-foreground'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>{lang.native}</span>
+                          <span className="text-xs text-muted-foreground">{lang.name}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Voice Search Button */}
+            <Button
+              size="sm"
+              variant="outline"
+              className={`gap-2 hidden sm:flex ${isMenuOpen ? 'hidden' : ''}`}
+              onClick={() => setIsVoiceSearchOpen(true)}
+            >
+              <Mic className="h-4 w-4" />
+              <span className="hidden lg:inline">{t('nav.voice')}</span>
+
             <Button 
               size="sm" 
               variant="outline" 
@@ -180,9 +225,7 @@ const Navigation = () => {
               <ShoppingBag className="h-4 w-4" />
             </Button>
 
-
             {/* User Authentication */}
-
             {currentUser ? (
 
               <DropdownMenu>
@@ -195,7 +238,7 @@ const Navigation = () => {
                     <Avatar className="h-6 w-6">
                       <AvatarImage
                         src={userProfile?.photoURL}
-                        alt={userProfile?.displayName || "User"}
+                        alt={userProfile?.displayName || t('nav.user')}
                       />
                       <AvatarFallback className="text-xs">
                         {userProfile?.displayName
@@ -203,7 +246,7 @@ const Navigation = () => {
                           : "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden lg:inline">{userProfile?.displayName || "User"}</span>
+                    <span className="hidden lg:inline">{userProfile?.displayName || t('nav.user')}</span>
                     <ChevronDown className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -235,11 +278,11 @@ const Navigation = () => {
               >
                 <LogIn className="h-4 w-4" />
 
+
                 <span className="hidden lg:inline">Sign In</span>
 
               </Button>
             )}
-
 
             {/* Mobile Menu Button */}
             <Button
@@ -260,7 +303,7 @@ const Navigation = () => {
               {/* Mobile Search Bar */}
               <div className="relative mb-4">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search..." className="pl-10 bg-muted/50" />
+                <Input placeholder={t('nav.search_placeholder')} className="pl-10 bg-muted/50" />
               </div>
 
               {/* Navigation Links */}
@@ -289,6 +332,24 @@ const Navigation = () => {
                   </Button>
                 )
               )}
+
+              {/* Mobile Language Selector */}
+              <div className="mb-3">
+                <div className="text-xs text-muted-foreground mb-2">Language</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {languages.map((lang) => (
+                    <Button
+                      key={lang.code}
+                      size="sm"
+                      variant={language === lang.code ? "default" : "outline"}
+                      onClick={() => handleLanguageChange(lang)}
+                      className="text-xs"
+                    >
+                      {lang.native}
+                    </Button>
+                  ))}
+                </div>
+              </div>
 
               {/* Mobile Action Buttons */}
               <div className="pt-2 mt-2 border-t border-border">
