@@ -1,20 +1,33 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { 
   User, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
-  sendPasswordResetEmail
+  RecaptchaVerifier,
+  PhoneAuthProvider,
+  signInWithCredential
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { setupRecaptchaVerifier } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
+import { authAPI } from '@/services/api';
+
+// This component uses Firebase's free built-in reCAPTCHA for phone authentication
+// No Enterprise reCAPTCHA is required - Firebase handles the reCAPTCHA configuration automatically
+
+// Extend Window interface for reCAPTCHA verifier
+declare global {
+  interface Window {
+    recaptchaVerifier?: RecaptchaVerifier;
+  }
+}
 
 interface UserProfile {
   uid: string;
-  email: string;
+  email?: string;
   phoneNumber?: string;
   displayName?: string;
   photoURL?: string;
@@ -32,11 +45,10 @@ interface AuthContextType {
   currentUser: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, phoneNumber: string) => Promise<void>;
+  loginWithPhone: (phoneNumber: string) => Promise<{ verificationId: string }>;
+  verifyOTP: (verificationId: string, otp: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
   updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
   requestLocationAccess: () => Promise<boolean>;
 }
@@ -74,11 +86,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
-  const createUserProfile = async (uid: string, email: string, phoneNumber: string) => {
+  const createUserProfile = async (uid: string, phoneNumber?: string, email?: string) => {
     const userProfile: UserProfile = {
       uid,
-      email,
-      phoneNumber,
+      phoneNumber: phoneNumber ?? null,
+      email: email ?? null,
       createdAt: new Date(),
       lastLogin: new Date(),
     };
@@ -87,59 +99,95 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserProfile(userProfile);
   };
 
-  const login = async (email: string, password: string) => {
+  const loginWithPhone = async (phoneNumber: string): Promise<{ verificationId: string }> => {
     try {
-      // Demo mode fallback if Firebase not configured
-      if (!import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY.includes('your_api_key')) {
-        // Simulate successful login for demo
-        const mockUser = {
-          uid: 'demo-user-123',
-          email: email,
-          displayName: email.split('@')[0],
-          photoURL: null
-        } as User;
-        
-        const mockProfile: UserProfile = {
-          uid: 'demo-user-123',
-          email: email,
-          phoneNumber: '+1234567890',
-          displayName: email.split('@')[0],
-          createdAt: new Date(),
-          lastLogin: new Date()
-        };
-        
-        setCurrentUser(mockUser);
-        setUserProfile(mockProfile);
-        return;
+      console.log('Firebase config check:', {
+        apiKey: import.meta.env.VITE_FIREBASE_API_KEY ? 'Set' : 'Not set',
+        authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ? 'Set' : 'Not set',
+        projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ? 'Set' : 'Not set'
+      });
+
+      // Demo mode fallback if Firebase not configured or billing not enabled
+      if (!import.meta.env.VITE_FIREBASE_API_KEY || 
+          import.meta.env.VITE_FIREBASE_API_KEY.includes('your_api_key') ||
+          import.meta.env.VITE_FIREBASE_API_KEY.includes('AIzaSyB')) {
+        console.log('Using demo mode - Firebase not configured or billing not enabled');
+        console.log('💡 Recommendation: Use Google Sign-in instead (completely free)');
+        // Simulate successful phone verification for demo
+        const mockVerificationId = 'demo-verification-' + Date.now();
+        return { verificationId: mockVerificationId };
       }
+
+      console.log('Firebase is configured, proceeding with phone auth');
+      console.log('Auth instance:', auth);
+      console.log('Phone number:', phoneNumber);
+
+      // Setup reCAPTCHA verifier using the utility function
+      // This automatically uses Firebase's free built-in reCAPTCHA
+      console.log('Setting up reCAPTCHA verifier with free built-in reCAPTCHA');
+      const recaptchaVerifier = setupRecaptchaVerifier();
+
+      console.log('Rendering reCAPTCHA');
+      // Render the reCAPTCHA
+      await recaptchaVerifier.render();
+
+      console.log('Creating phone provider');
+      const phoneProvider = new PhoneAuthProvider(auth);
       
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      // Update last login
-      if (result.user) {
-        await updateUserProfile({ lastLogin: new Date() });
+      console.log('Verifying phone number');
+      const verificationId = await phoneProvider.verifyPhoneNumber(
+        phoneNumber, 
+        recaptchaVerifier
+      );
+
+      console.log('Phone verification successful, verificationId:', verificationId);
+      return { verificationId };
+    } catch (error: any) {
+      console.error('Phone authentication error:', error);
+      console.error('Error details:', {
+        code: error.code,
+        message: error.message,
+        stack: error.stack
+      });
+
+      // Handle specific Firebase errors
+      if (error.code === 'auth/billing-not-enabled') {
+        throw new Error(
+          'Phone authentication requires billing to be enabled. ' +
+          '💡 Use Google Sign-in instead (completely free) or enable billing in Firebase Console. ' +
+          'You get 10,000 free SMS verifications per month.'
+        );
+      } else if (error.code === 'auth/invalid-phone-number') {
+        throw new Error('Invalid phone number format. Please include country code (e.g., +91XXXXXXXXXX)');
+      } else if (error.code === 'auth/too-many-requests') {
+        throw new Error('Too many requests. Please try again later');
+      } else if (error.code === 'auth/quota-exceeded') {
+        throw new Error('SMS quota exceeded. Please try again later or use Google Sign-in');
+      } else if (error.code === 'auth/network-request-failed') {
+        throw new Error('Network error. Please check your connection and try again');
+      } else {
+        // For other errors, provide a generic message
+        throw new Error(`Authentication failed: ${error.message || 'Unknown error occurred'}`);
       }
-    } catch (error) {
-      throw error;
     }
   };
 
-  const signup = async (email: string, password: string, phoneNumber: string) => {
+  const verifyOTP = async (verificationId: string, otp: string) => {
     try {
       // Demo mode fallback if Firebase not configured
       if (!import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY.includes('your_api_key')) {
-        // Simulate successful signup for demo
+        // Simulate successful OTP verification for demo
         const mockUser = {
           uid: 'demo-user-' + Date.now(),
-          email: email,
-          displayName: email.split('@')[0],
+          phoneNumber: '+1234567890',
+          displayName: 'Demo User',
           photoURL: null
         } as User;
         
         const mockProfile: UserProfile = {
           uid: mockUser.uid,
-          email: email,
-          phoneNumber: phoneNumber,
-          displayName: email.split('@')[0],
+          phoneNumber: '+1234567890',
+          displayName: 'Demo User',
           createdAt: new Date(),
           lastLogin: new Date()
         };
@@ -148,10 +196,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserProfile(mockProfile);
         return;
       }
+
+      const credential = PhoneAuthProvider.credential(verificationId, otp);
+      const result = await signInWithCredential(auth, credential);
       
-      const result = await createUserWithEmailAndPassword(auth, email, password);
       if (result.user) {
-        await createUserProfile(result.user.uid, email, phoneNumber);
+        // Check if user profile exists, if not create one
+        const userDoc = await getDoc(doc(db, 'users', result.user.uid));
+        if (!userDoc.exists()) {
+          await createUserProfile(result.user.uid, result.user.phoneNumber || undefined);
+        }
+        await updateUserProfile({ lastLogin: new Date() });
       }
     } catch (error) {
       throw error;
@@ -162,15 +217,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      
       if (result.user) {
-        // Check if user profile exists, if not create one
-        const userDoc = await getDoc(doc(db, 'users', result.user.uid));
-        if (!userDoc.exists()) {
-          await createUserProfile(result.user.uid, result.user.email || '', '');
+        // Get the Firebase ID token
+        const idToken = await result.user.getIdToken();
+        console.log('🔐 Got Firebase ID token, sending to backend');
+        
+        try {
+          // Send token to backend for verification and user creation
+          const response = await authAPI.googleLogin(idToken);
+
+          if (response.success) {
+            // Store backend token in localStorage or state
+            localStorage.setItem('backendToken', response.data.token);
+            
+            // Check if user profile exists, if not create one
+            const userDoc = await getDoc(doc(db, 'users', result.user.uid));
+            if (!userDoc.exists()) {
+              await createUserProfile(result.user.uid, undefined, result.user.email || '');
+            }
+            await updateUserProfile({ lastLogin: new Date() });
+
+            // Show success message
+            if (response.data.isNewUser) {
+              toast.success('Welcome! Your account has been created successfully.');
+            } else {
+              toast.success('Welcome back! Login successful.');
+            }
+          } else {
+            throw new Error(response.message || 'Backend authentication failed');
+          }
+        } catch (backendError) {
+          console.error('Backend authentication error:', backendError);
+          // Fallback to frontend-only authentication if backend fails
+          console.log('⚠️  Backend failed, using frontend-only auth');
+          
+          // Check if user profile exists, if not create one
+          const userDoc = await getDoc(doc(db, 'users', result.user.uid));
+          if (!userDoc.exists()) {
+            await createUserProfile(result.user.uid, undefined, result.user.email || '');
+          }
+          await updateUserProfile({ lastLogin: new Date() });
+          
+          toast.success('Login successful! (Frontend mode)');
         }
-        await updateUserProfile({ lastLogin: new Date() });
       }
     } catch (error) {
+      console.error('Google login error:', error);
       throw error;
     }
   };
@@ -178,14 +271,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       await signOut(auth);
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const resetPassword = async (email: string) => {
-    try {
-      await sendPasswordResetEmail(auth, email);
     } catch (error) {
       throw error;
     }
@@ -260,11 +345,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     currentUser,
     userProfile,
     loading,
-    login,
-    signup,
+    loginWithPhone,
+    verifyOTP,
     loginWithGoogle,
     logout,
-    resetPassword,
     updateUserProfile,
     requestLocationAccess,
   };
