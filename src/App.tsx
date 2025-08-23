@@ -12,7 +12,12 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { SearchProvider } from "@/contexts/SearchContext";
 import { Toaster as HotToaster } from "react-hot-toast";
 
+import Index from "./pages/Index";
 import ARViewer from "./pages/ARViewer";
+import AllCollections from "./pages/AllCollections";
+import CollectionDetail from "./pages/CollectionDetail";
+import AllArtists from "./pages/AllArtists";
+import ArtistProfile from "./pages/ArtistProfile";
 
 import NotFound from "./pages/NotFound";
 import AuthDemo from "./pages/AuthDemo";
@@ -40,6 +45,12 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/ar-viewer" element={<ARViewer />} />
+
+              <Route path="/collections" element={<AllCollections />} />
+              <Route path="/collections/:id" element={<CollectionDetail />} />
+              <Route path="/artists" element={<AllArtists />} />
+              <Route path="/artists/:id" element={<ArtistProfile />} />
+
               <Route path="/auth-demo" element={<AuthDemo />} />
               <Route path="/children" element={<Children />} />
               <Route path="/marketplace" element={<Marketplace />} />

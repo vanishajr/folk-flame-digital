@@ -5,6 +5,7 @@ import FeaturedArtists from "@/components/FeaturedArtists";
 import FeatureHighlights from "@/components/FeatureHighlights";
 
 import ARExperience from "@/components/ARExperience";
+import PersonalizedRecommendations from "@/components/PersonalizedRecommendations";
 
 import CulturalMap from "@/components/CulturalMap";
 import SearchResults from "@/components/SearchResults";
@@ -22,6 +23,7 @@ const Index = () => {
         <FeatureHighlights />
 
         <ARExperience />
+        <PersonalizedRecommendations />
 
         <CulturalMap />
         <SearchResults />

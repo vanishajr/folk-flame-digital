@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Award, Users, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const FeaturedArtists = () => {
   const artists = [
@@ -14,7 +15,7 @@ const FeaturedArtists = () => {
       recognition: "Padma Shri",
       followers: "2.3k",
       artworks: 156,
-      image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400&h=400&fit=crop&crop=face",
+      image: "https://mainbhibharat.co.in/wp-content/uploads/2023/12/Bhuri-bai.jpg",
       specialty: "Traditional dot paintings depicting tribal life"
     },
     {
@@ -26,7 +27,7 @@ const FeaturedArtists = () => {
       recognition: "National Award",
       followers: "1.8k",
       artworks: 203,
-      image: "https://images.unsplash.com/photo-1494790108755-2616c6d58ad1?w=400&h=400&fit=crop&crop=face",
+      image: "https://upload.wikimedia.org/wikipedia/commons/7/70/Sita_Devi_of_Kapurthala.jpg",
       specialty: "Intricate fish and bird motifs in traditional style"
     },
     {
@@ -38,7 +39,7 @@ const FeaturedArtists = () => {
       recognition: "Padma Shri",
       followers: "3.1k",
       artworks: 289,
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+      image: "https://upload.wikimedia.org/wikipedia/commons/f/f6/Jivya_Soma_Mashe.jpg",
       specialty: "Contemporary interpretations of ancient Warli traditions"
     },
     {
@@ -50,8 +51,56 @@ const FeaturedArtists = () => {
       recognition: "State Award",
       followers: "1.2k",
       artworks: 134,
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTp_yNnSSQa7xMov45V2jGOJK_14PwDfWr-yl_H46Kf0Mau9DieftVnocqSGTMy-DqKcu0&usqp=CAU",
       specialty: "Ritualistic horse paintings and spiritual symbols"
+    },
+    {
+      id: 5,
+      name: "Jangarh Singh Shyam",
+      artform: "Gond Art",
+      location: "Madhya Pradesh",
+      experience: "25+ years",
+      recognition: "International Recognition",
+      followers: "4.2k",
+      artworks: 312,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDYKDkh9IJNECuJ_AM_3GcBT1rfo1pVKp63XyWqcHPwW155eF-3142Q55ohiX6nDiRv9I&usqp=CAU",
+      specialty: "Revolutionary Gond art with contemporary themes"
+    },
+    {
+      id: 6,
+      name: "Kalam Patua",
+      artform: "Kalighat",
+      location: "West Bengal",
+      experience: "45+ years",
+      recognition: "Padma Shri",
+      followers: "3.8k",
+      artworks: 267,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpe_nJrY7Y0fU6SS4QqpynEBvpGqlfoXLw9ZdgKgsz-LZHmDbhrcDxoPgz4wEY63W10Uc&usqp=CAU",
+      specialty: "Modern Kalighat paintings with social commentary"
+    },
+    {
+      id: 7,
+      name: "Rani Jha",
+      artform: "Madhubani",
+      location: "Bihar",
+      experience: "38+ years",
+      recognition: "National Award",
+      followers: "2.7k",
+      artworks: 189,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxP1XmZ2ZK-fevL6QntPbBYOn-z9S7ij2axQ&s",
+      specialty: "Contemporary Madhubani with feminist themes"
+    },
+    {
+      id: 8,
+      name: "Anil Vangad",
+      artform: "Warli",
+      location: "Maharashtra",
+      experience: "42+ years",
+      recognition: "State Award",
+      followers: "1.9k",
+      artworks: 145,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4LbzQku3jByEzUO3ecKOYOEeW-EnXruz5BAhgzFnE9FpXDPnKBKToDZo9-VvI_a_vyiY&usqp=CAU",
+      specialty: "Traditional Warli with environmental themes"
     }
   ];
 
@@ -115,22 +164,26 @@ const FeaturedArtists = () => {
                   <span>{artist.artworks} artworks</span>
                 </div>
                 
-                <Button 
-                  variant="outline" 
-                  className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors text-sm"
-                >
-                  View Profile
-                </Button>
+                <Link to={`/artists/${artist.id}`}>
+                  <Button 
+                    variant="outline" 
+                    className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors text-sm"
+                  >
+                    View Profile
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           ))}
         </div>
 
         <div className="text-center">
-          <Button size="lg" className="bg-primary hover:bg-primary/90 font-semibold px-8">
-            Discover More Artists
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          <Link to="/artists">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 font-semibold px-8">
+              Discover More Artists
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

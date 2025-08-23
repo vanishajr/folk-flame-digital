@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Eye, Heart, Share2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import madhubaniArt from "@/assets/madhubani-art.jpg";
 import pithoraArt from "@/assets/pithora-art.jpg";
 import heroWarliArt from "@/assets/hero-warli-art.jpg";
@@ -99,20 +100,24 @@ const FeaturedCollections = () => {
                   <span>{collection.period}</span>
                 </div>
                 
-                <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                  View Details
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <Link to={`/collections/${collection.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    View Details
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           ))}
         </div>
 
         <div className="text-center">
-          <Button size="lg" className="bg-primary hover:bg-primary/90 font-semibold px-8">
-            View All Collections
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          <Link to="/collections">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 font-semibold px-8">
+              View All Collections
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
